@@ -17,26 +17,17 @@ const ProductUpdateSchema = z.object({
 
 export async function PATCH(req: Request, ctx: any) {
     try {
-        const { id } = (ctx as { params: { id: string } }).params
-        const numId = Number(id)
-        if (!Number.isFinite(numId)) {
-            return NextResponse.json({ error: 'Bad id' }, { status: 400 })
-        }
+        const id = Number((ctx as { params: { id: string } }).params.id)
+        if (!Number.isFinite(id)) return NextResponse.json({ error: 'Bad id' }, { status: 400 })
 
         const raw = await req.json()
         const data = ProductUpdateSchema.parse(raw)
 
-        const updated = await prisma.plywoodProduct.update({
-            where: { id: numId },
-            data,
-        })
+        const updated = await prisma.plywoodProduct.update({ where: { id }, data })
         return NextResponse.json(updated)
     } catch (e) {
         if (e instanceof z.ZodError) {
-            return NextResponse.json(
-                { error: 'Validation error', details: e.flatten() },
-                { status: 400 }
-            )
+            return NextResponse.json({ error: 'Validation error', details: e.flatten() }, { status: 400 })
         }
         return NextResponse.json({ error: 'Database error' }, { status: 500 })
     }
@@ -44,13 +35,10 @@ export async function PATCH(req: Request, ctx: any) {
 
 export async function DELETE(_req: Request, ctx: any) {
     try {
-        const { id } = (ctx as { params: { id: string } }).params
-        const numId = Number(id)
-        if (!Number.isFinite(numId)) {
-            return NextResponse.json({ error: 'Bad id' }, { status: 400 })
-        }
+        const id = Number((ctx as { params: { id: string } }).params.id)
+        if (!Number.isFinite(id)) return NextResponse.json({ error: 'Bad id' }, { status: 400 })
 
-        await prisma.plywoodProduct.delete({ where: { id: numId } })
+        await prisma.plywoodProduct.delete({ where: { id } })
         return NextResponse.json({ ok: true })
     } catch {
         return NextResponse.json({ error: 'Database error' }, { status: 500 })
