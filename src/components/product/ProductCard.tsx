@@ -31,7 +31,7 @@ type ProductCardProps = {
     fixedHeight?: number // default 420
 }
 
-/** ✅ Custom hook: додає поточне значення в список, якщо його там немає */
+/** додає поточне значення в список, якщо його там немає */
 function useEnsureCurrent<T>(arr: T[] | undefined, current: T) {
     return useMemo(() => {
         const base = Array.isArray(arr) ? [...arr] : []
@@ -65,7 +65,9 @@ export default function ProductCard({
         setWaterproofing(product.waterproofing)
     }, [product])
 
-    // ✅ без порушення правил hooks
+    // inStock у старих сидів може бути відсутній → вважаємо true за замовчуванням
+    const inStock = product.inStock !== false
+
     const optTypes = useEnsureCurrent(options?.types, product.type)
     const optThicknesses = useEnsureCurrent(options?.thicknesses, product.thickness)
     const optFormats = useEnsureCurrent(options?.formats, product.format)
@@ -84,9 +86,18 @@ export default function ProductCard({
                     isOpen ? '-translate-y-full' : 'translate-y-0'
                 }`}
             >
-                <div className="text-sm font-semibold mb-2 text-neutral-800">
+                <div className="text-sm font-semibold mb-2 text-neutral-800 flex items-center gap-2">
                     {product.type} {product.thickness} мм
+                    <span
+                        className={`ml-auto inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium ${
+                            inStock ? 'bg-green-100 text-green-700' : 'bg-neutral-200 text-neutral-700'
+                        }`}
+                        title={inStock ? 'В наявності' : 'Немає в наявності'}
+                    >
+            {inStock ? 'В наявності' : 'Немає'}
+          </span>
                 </div>
+
                 <div className="w-full h-48 bg-neutral-100 rounded-md overflow-hidden mb-4 relative">
                     <Image
                         src={product.image}
@@ -95,6 +106,11 @@ export default function ProductCard({
                         sizes="(max-width: 768px) 100vw, 33vw"
                         className="object-contain"
                     />
+                    {!inStock && (
+                        <div className="absolute inset-x-0 bottom-0 bg-black/40 text-white text-xs text-center py-1">
+                            Немає в наявності
+                        </div>
+                    )}
                 </div>
 
                 <div className="text-sm text-neutral-600">
@@ -107,11 +123,25 @@ export default function ProductCard({
                 </div>
 
                 <div className="mt-auto flex justify-between items-center">
-                    <p className="font-semibold text-neutral-900">₴{product.price} / лист</p>
+                    <p
+                        className={`font-semibold ${
+                            inStock ? 'text-neutral-900' : 'text-neutral-400 line-through'
+                        }`}
+                    >
+                        ₴{product.price} / лист
+                    </p>
                     {onToggle && (
                         <button
                             onClick={onToggle}
-                            className="w-8 h-8 flex items-center justify-center rounded bg-[#D08B4C] text-white text-lg hover:bg-[#c57b37]"
+                            disabled={!inStock}
+                            className={`w-8 h-8 flex items-center justify-center rounded text-lg ${
+                                inStock
+                                    ? 'bg-[#D08B4C] text-white hover:bg-[#c57b37]'
+                                    : 'bg-neutral-300 text-white cursor-not-allowed'
+                            }`}
+                            aria-disabled={!inStock}
+                            aria-label={inStock ? 'Налаштувати та додати' : 'Немає в наявності'}
+                            title={inStock ? 'Налаштувати та додати' : 'Немає в наявності'}
                         >
                             +
                         </button>
@@ -126,8 +156,15 @@ export default function ProductCard({
                 }`}
             >
                 <div className="space-y-1">
-                    <h3 className="text-lg font-semibold mb-2 text-neutral-900">
+                    <h3 className="text-lg font-semibold mb-2 text-neutral-900 flex items-center gap-2">
                         Фанера {product.type} {product.thickness} мм
+                        <span
+                            className={`ml-auto inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium ${
+                                inStock ? 'bg-green-100 text-green-700' : 'bg-neutral-200 text-neutral-700'
+                            }`}
+                        >
+              {inStock ? 'В наявності' : 'Немає'}
+            </span>
                     </h3>
 
                     <Select
@@ -171,6 +208,11 @@ export default function ProductCard({
                         options={optGrades.map(v => ({ value: v, label: v }))}
                     />
 
+                    {/* виробник не змінюємо тут, але зберігаємо поточний */}
+                    <input type="hidden" value={manufacturer} readOnly />
+                    {!inStock && (
+                        <p className="text-xs text-red-600 mt-2">Товар наразі відсутній — додавання до кошика вимкнено.</p>
+                    )}
                 </div>
 
                 <div className="flex justify-between items-center mt-4">
@@ -182,6 +224,7 @@ export default function ProductCard({
                             <button
                                 onClick={onToggle}
                                 className="w-10 h-10 flex items-center justify-center border rounded text-gray-600 hover:bg-gray-100"
+                                aria-label="Закрити"
                             >
                                 ✕
                             </button>
@@ -198,7 +241,15 @@ export default function ProductCard({
                                     waterproofing,
                                 })
                             }
-                            className="w-10 h-10 flex items-center justify-center bg-[#D08B4C] text-white rounded hover:bg-[#c57b37]"
+                            disabled={!inStock}
+                            className={`w-10 h-10 flex items-center justify-center rounded ${
+                                inStock
+                                    ? 'bg-[#D08B4C] text-white hover:bg-[#c57b37]'
+                                    : 'bg-neutral-300 text-white cursor-not-allowed'
+                            }`}
+                            aria-disabled={!inStock}
+                            aria-label={inStock ? 'Додати до кошика' : 'Немає в наявності'}
+                            title={inStock ? 'Додати до кошика' : 'Немає в наявності'}
                         >
                             ✔
                         </button>

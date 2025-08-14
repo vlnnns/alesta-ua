@@ -5,14 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="de175ab0-8428-40e4-8774-4f2fdb6fd17e" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/app/api/recommend/route.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/QuizStep.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/RecommendedProducts.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/ReviewsCarousel.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/TrustedPartnerSection.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/app/admin/products/page.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/app/api/admin/products/[id]/route.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/app/api/admin/products/route.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/admin/AdminProductsClient.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/quiz/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/quiz/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prisma/dev.db" beforeDir="false" afterPath="$PROJECT_DIR$/prisma/dev.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/prisma/schema.prisma" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prisma/seed.ts" beforeDir="false" afterPath="$PROJECT_DIR$/prisma/seed.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/catalog/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/catalog/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/globals.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/product/ProductCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/product/ProductCard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/quiz/OptionCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/quiz/OptionCard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/quiz/ResultsGrid.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/quiz/ResultsGrid.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/prisma.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/prisma.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,7 +59,7 @@
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;javascript.nodejs.core.library.configured.version&quot;: &quot;22.17.1&quot;,
     &quot;javascript.nodejs.core.library.typings.version&quot;: &quot;22.17.0&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/admin/vln/work/alesta&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/admin/vln/work/alesta/src/app/catalog&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -68,7 +76,13 @@
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/app/catalog" />
       <recent name="$PROJECT_DIR$/src" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/components/catalog" />
+      <recent name="$PROJECT_DIR$/src" />
+      <recent name="$PROJECT_DIR$/src/components/quiz" />
     </key>
   </component>
   <component name="SharedIndexes">
@@ -88,7 +102,8 @@
       <updated>1754296078539</updated>
       <workItem from="1754296079734" duration="7973000" />
       <workItem from="1754412689739" duration="8343000" />
-      <workItem from="1754765189848" duration="706000" />
+      <workItem from="1754765189848" duration="11144000" />
+      <workItem from="1755070985098" duration="4175000" />
     </task>
     <servers />
   </component>

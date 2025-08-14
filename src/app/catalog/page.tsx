@@ -38,7 +38,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: { ty
 
     return (
         <main className="bg-white text-neutral-800">
-            <div className="w-full px-4 sm:px-6 py-10">
+            <div className="w-full px-4 sm:px-6 py-10 max-w-7xl mx-auto">
                 {/* breadcrumbs */}
                 <nav className="text-sm text-neutral-500 mb-6">
                     <Link href="/" className="hover:text-neutral-700">Головна</Link>
@@ -51,9 +51,9 @@ export default async function CatalogPage({ searchParams }: { searchParams: { ty
                 </h1>
 
                 {/* 2 columns: sidebar + content */}
-                <div className="flex flex-col lg:flex-row gap-8">
+                <div className="flex flex-col sm:flex-row gap-8">
                     {/* LEFT — types */}
-                    <aside className="w-full lg:w-[260px] lg:shrink-0 lg:sticky lg:top-24 self-start">
+                    <aside className="w-full sm:w-[260px] sm:shrink-0 sm:sticky sm:top-24 self-start">
                         <h2 className="text-lg font-semibold mb-4 text-neutral-900">Типи фанери</h2>
                         <ul className="space-y-2">
                             <li>

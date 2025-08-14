@@ -27,18 +27,7 @@ export default function OptionCard({ option, isActive, onClick }: Props) {
                 : 'border-neutral-200 hover:border-neutral-300 focus:ring-2 focus:ring-neutral-300/70'}
       `}
         >
-            <div className="relative w-full h-[55%] bg-neutral-100">
-                {img ? (
-                    <Image
-                        src={img}
-                        alt={option}
-                        fill
-                        className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-                        sizes="(max-width: 640px) 170px, 170px"
-                    />
-                ) : (
-                    <div className="absolute inset-0 grid place-items-center text-neutral-400 text-xs">No image</div>
-                )}
+            <div className="relative w-full bg-neutral-100">
                 {isActive && (
                     <div className="absolute right-2 top-2 rounded-full bg-[#D08B4C] text-white text-[10px] px-2 py-0.5">
                         вибрано
@@ -46,7 +35,7 @@ export default function OptionCard({ option, isActive, onClick }: Props) {
                 )}
             </div>
 
-            <div className="h-[45%] grid content-center text-center">
+            <div className="h-[100%] grid content-center text-center">
                 <div className="text-[11px] text-neutral-500 line-clamp-2">
                     {optionDescriptions[option] || '\u00A0'}
                 </div>

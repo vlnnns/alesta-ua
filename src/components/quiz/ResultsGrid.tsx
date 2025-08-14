@@ -22,7 +22,7 @@ export default function ResultsGrid({ items, onEditFilters, title = 'Резул�
     return (
         <div className="w-full">
             <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl sm:text-2xl font-semibold">{title}</h2>
+                <h2 className="text-xl sm:text-2xl font-semibold text-neutral-800">{title}</h2>
                 {onEditFilters && (
                     <button
                         onClick={onEditFilters}
