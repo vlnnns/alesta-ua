@@ -5,7 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="de175ab0-8428-40e4-8774-4f2fdb6fd17e" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/src/app/api/admin/products/[id]/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/api/admin/products/[id]/route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/next.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/next.config.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -88,7 +88,7 @@
       <workItem from="1754296079734" duration="7973000" />
       <workItem from="1754412689739" duration="8343000" />
       <workItem from="1754765189848" duration="11144000" />
-      <workItem from="1755070985098" duration="4686000" />
+      <workItem from="1755070985098" duration="4854000" />
     </task>
     <servers />
   </component>
