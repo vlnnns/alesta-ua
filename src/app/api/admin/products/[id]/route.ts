@@ -15,14 +15,11 @@ const ProductUpdateSchema = z.object({
     inStock: z.boolean().optional(),
 })
 
-// PATCH /api/admin/products/[id]
-export async function PATCH(
-    req: Request,
-    { params }: { params: Record<string, string> }
-) {
+export async function PATCH(req: Request, ctx: any) {
     try {
-        const id = Number(params.id)
-        if (!Number.isFinite(id)) {
+        const { id } = (ctx as { params: { id: string } }).params
+        const numId = Number(id)
+        if (!Number.isFinite(numId)) {
             return NextResponse.json({ error: 'Bad id' }, { status: 400 })
         }
 
@@ -30,7 +27,7 @@ export async function PATCH(
         const data = ProductUpdateSchema.parse(raw)
 
         const updated = await prisma.plywoodProduct.update({
-            where: { id },
+            where: { id: numId },
             data,
         })
         return NextResponse.json(updated)
@@ -45,18 +42,15 @@ export async function PATCH(
     }
 }
 
-// DELETE /api/admin/products/[id]
-export async function DELETE(
-    _req: Request,
-    { params }: { params: Record<string, string> }
-) {
+export async function DELETE(_req: Request, ctx: any) {
     try {
-        const id = Number(params.id)
-        if (!Number.isFinite(id)) {
+        const { id } = (ctx as { params: { id: string } }).params
+        const numId = Number(id)
+        if (!Number.isFinite(numId)) {
             return NextResponse.json({ error: 'Bad id' }, { status: 400 })
         }
 
-        await prisma.plywoodProduct.delete({ where: { id } })
+        await prisma.plywoodProduct.delete({ where: { id: numId } })
         return NextResponse.json({ ok: true })
     } catch {
         return NextResponse.json({ error: 'Database error' }, { status: 500 })
