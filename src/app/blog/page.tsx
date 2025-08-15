@@ -1,4 +1,5 @@
 // app/blog/page.tsx
+import Link from 'next/link'
 import BlogCard from '@/components/blog/BlogCard'
 import { blogPosts } from '@/data/blog'
 
@@ -13,7 +14,14 @@ export default function BlogPage() {
     return (
         <main className="px-4 sm:px-6 py-12 bg-white">
             <div className="max-w-7xl mx-auto">
-                <h1 className="text-3xl sm:text-5xl font-semibold tracking-tight mb-8">Блог</h1>
+                {/* Хлебные крошки */}
+                <nav className="mb-6 text-sm text-neutral-500 flex gap-2 items-center">
+                    <Link href="/" className="hover:underline">Головна</Link>
+                    <span>/</span>
+                    <span className="text-neutral-800">Блог</span>
+                </nav>
+
+                <h1 className="text-3xl sm:text-5xl font-semibold tracking-tight mb-8 text-neutral-800">Блог</h1>
 
                 {/* Hero зверху */}
                 <div className="mb-10">

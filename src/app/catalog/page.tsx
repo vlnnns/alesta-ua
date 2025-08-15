@@ -20,12 +20,23 @@ const TYPES: PlywoodType[] = ['ФСФ','ФК','ФКМ','Ламінована','�
 
 function getTypeParam(raw: unknown): FilterType {
     if (typeof raw !== 'string') return 'all'
-    const v = decodeURIComponent(raw)
-    return (TYPES as readonly string[]).includes(v) ? (v as PlywoodType) : 'all'
+    try {
+        const v = decodeURIComponent(raw)
+        return (TYPES as readonly string[]).includes(v) ? (v as PlywoodType) : 'all'
+    } catch {
+        return 'all'
+    }
 }
 
-export default async function CatalogPage({ searchParams }: { searchParams: { type?: string } }) {
-    const typeParam = getTypeParam(searchParams?.type)
+type CatalogSearchParams = { type?: string }
+
+export default async function CatalogPage({
+                                              searchParams,
+                                          }: {
+    searchParams: Promise<CatalogSearchParams> // ← главное изменение
+}) {
+    const sp = await searchParams                   // ← ждём промис
+    const typeParam = getTypeParam(sp?.type)
 
     const where: Prisma.PlywoodProductWhereInput =
         typeParam === 'all' ? {} : { type: typeParam }
@@ -89,7 +100,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: { ty
                         </ul>
                     </aside>
 
-                    {/* RIGHT — products with “+” and таким же поведением */}
+                    {/* RIGHT — products */}
                     <section className="flex-1 min-w-0">
                         <div className="mb-4">
               <span className="inline-flex items-center gap-2 text-sm px-3 py-1.5 rounded-full bg-black/5 text-neutral-700">

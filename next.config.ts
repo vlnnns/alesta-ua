@@ -13,8 +13,6 @@ const nextConfig: NextConfig = {
         ignoreDuringBuilds: true,
     },
 
-    // (необязательно) если используете внешние картинки через <Image/>
-    images: { remotePatterns: [{ protocol: 'https', hostname: '**' }] },
 };
 
 export default nextConfig;

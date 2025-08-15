@@ -3,9 +3,9 @@ import { PrismaClient, Prisma } from '@prisma/client'
 const prisma = new PrismaClient()
 
 const data: Prisma.PlywoodProductCreateManyInput[] = [
-    { type: 'ФСФ', thickness: 12, format: '2500x1250', grade: 'BB/BB (2/2)', manufacturer: 'Україна', waterproofing: 'Підвищена', price: 850, image: '/plywood/fsf.jpg', inStock: true },
-    { type: 'ФК',  thickness: 9,  format: '2500x1250', grade: 'B/BB (1/2)', manufacturer: 'Одек',    waterproofing: 'Підвищена', price: 720, image: '/plywood/fk.jpg',  inStock: true },
-    { type: 'Ламінована', thickness: 15, format: '3000x1500', grade: 'BB/C (2/4)', manufacturer: 'Україна', waterproofing: 'Водостійка', price: 1250, image: '/plywood/laminated.jpg', inStock: false },
+    { type: 'ФСФ', thickness: 12, format: '2500x1250', grade: 'BB/BB (2/2)', manufacturer: 'Україна', waterproofing: 'Підвищена', price: 850, image: '/plywood/fsf.png', inStock: true },
+    { type: 'ФК',  thickness: 9,  format: '2500x1250', grade: 'B/BB (1/2)', manufacturer: 'Одек',    waterproofing: 'Підвищена', price: 720, image: '/plywood/fk.png',  inStock: true },
+    { type: 'Ламінована', thickness: 15, format: '3000x1500', grade: 'BB/C (2/4)', manufacturer: 'Україна', waterproofing: 'Водостійка', price: 1250, image: '/plywood/laminated.png', inStock: false },
 ]
 
 async function main() {

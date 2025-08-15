@@ -25,7 +25,7 @@ export default function CartDrawer() {
                     <button onClick={close} className="p-2 hover:bg-black/5 rounded cursor-pointer">✕</button>
                 </div>
 
-                <div className="p-4 space-y-4 overflow-y-auto h-[calc(100vh-180px)]">
+                <div className="p-4 space-y-4 overflow-y-auto h-[calc(100vh-180px)] text-neutral-800">
                     {items.length === 0 ? (
                         <p className="text-sm text-neutral-600">Кошик порожній</p>
                     ) : items.map(it => (

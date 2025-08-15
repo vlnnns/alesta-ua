@@ -9,11 +9,11 @@ export const optionDescriptions: Record<string, string> = {
 }
 
 export const optionImages: Record<string, string> = {
-    'ФСФ': '/images/quiz/fsf.jpg',
-    'ФК': '/images/quiz/fk.jpg',
-    'ФКМ': '/images/quiz/fkm.jpg',
-    'Ламінована': '/images/quiz/laminated.jpg',
-    'Для Лазера': '/images/quiz/laser.jpg',
-    'Транспортна': '/images/quiz/transport.jpg',
-    'Для Опалубки': '/images/quiz/formwork.jpg'
+    'ФСФ': '/images/quiz/fsf.png',
+    'ФК': '/images/quiz/fk.png',
+    'ФКМ': '/images/quiz/fkm.png',
+    'Ламінована': '/images/quiz/laminated.png',
+    'Для Лазера': '/images/quiz/laser.png',
+    'Транспортна': '/images/quiz/transport.png',
+    'Для Опалубки': '/images/quiz/formwork.png'
 }
