@@ -10,47 +10,50 @@ export async function POST(req: Request) {
     const password = String(form.get('password') ?? '')
     const nextRaw = form.get('next')
 
-    // Resolve & validate "next" to avoid invalid URL and open redirects
+    // allow only internal paths (no //, no /admin/login)
     let nextPath = '/admin'
-    if (typeof nextRaw === 'string') {
+    if (
+        typeof nextRaw === 'string' &&
+        nextRaw.startsWith('/') &&
+        !nextRaw.startsWith('//') &&
+        !nextRaw.startsWith('/admin/login')
+    ) {
         try {
-            const current = new URL(req.url)
-            const resolved = new URL(nextRaw, current) // handles relative/absolute safely
-            const sameOrigin = resolved.origin === current.origin
-            const notLogin = !resolved.pathname.startsWith('/admin/login')
-            const notSchemeRelative = !nextRaw.startsWith('//')
-            if (sameOrigin && notLogin && notSchemeRelative) {
-                nextPath = resolved.pathname + resolved.search + resolved.hash
-            }
-        } catch {
-            /* keep default /admin */
-        }
+            const u = new URL(nextRaw, 'http://dummy')
+            nextPath = u.pathname + u.search + u.hash
+        } catch {}
     }
 
-    const okUser = process.env.ADMIN_USER
-    const okPass = process.env.ADMIN_PASS
-    if (process.env.NODE_ENV === 'production' && (!okUser || !okPass)) {
+    const okUser = process.env.ADMIN_USER ?? 'admin'
+    const okPass = process.env.ADMIN_PASS ?? 'password'
+    if (process.env.NODE_ENV === 'production' && (!process.env.ADMIN_USER || !process.env.ADMIN_PASS)) {
         return NextResponse.json({ error: 'Admin credentials not configured' }, { status: 500 })
     }
 
-    // tiny delay to reduce brute-force (optional)
+    // small delay against brute force (optional)
     await new Promise(r => setTimeout(r, 150))
 
-    if (username !== (okUser ?? 'admin') || password !== (okPass ?? 'password')) {
-        const url = new URL('/admin/login', req.url)
+    // build origin from request headers (works behind nginx too)
+    const hdrs = new Headers(req.headers)
+    const host = hdrs.get('host') ?? new URL(req.url).host
+    const proto = (hdrs.get('x-forwarded-proto') ?? new URL(req.url).protocol.replace(':',''))
+    const origin = `${proto}://${host}`
+
+    if (username !== okUser || password !== okPass) {
+        const url = new URL('/admin/login', origin)
         url.searchParams.set('err', 'creds')
         url.searchParams.set('next', nextPath)
         return NextResponse.redirect(url, { status: 303 })
     }
 
-    const exp = Math.floor(Date.now() / 1000) + 60 * 60 * 8 // 8 hours
+    const exp = Math.floor(Date.now() / 1000) + 60 * 60 * 8
     const token = await signToken('admin', exp, process.env.AUTH_SECRET || 'dev-secret')
 
-    const res = NextResponse.redirect(new URL(nextPath, req.url), { status: 303 })
+    const res = NextResponse.redirect(new URL(nextPath, origin), { status: 303 })
     res.cookies.set('admin_session', token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',      // stricter for admin areas
+        secure: proto === 'https',
+        sameSite: 'strict',
         path: '/',
         maxAge: 60 * 60 * 8,
     })
