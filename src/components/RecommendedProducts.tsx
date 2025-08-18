@@ -97,7 +97,7 @@ export default function RecommendedProducts() {
                 ) : products.length === 0 ? (
                     <p className="text-white/70">Поки немає рекомендацій.</p>
                 ) : (
-                    <div className="flex flex-row items-center justify-between gap-6">
+                    <div className="flex flex-row flex-wrap items-center justify-between gap-6">
                         {products.map((p) => (
                             <ProductCard
                                 key={p.id}

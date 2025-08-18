@@ -5,23 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="de175ab0-8428-40e4-8774-4f2fdb6fd17e" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/public/ua-cities.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/blog/[slug]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/blog/[slug]/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/blog/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/blog/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/catalog/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/catalog/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/checkout/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/checkout/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/quiz/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/quiz/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/ContactSection.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/ContactSection.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/Footer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Footer.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/RecommendedProducts.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/RecommendedProducts.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/ReviewsCarousel.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/ReviewsCarousel.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/blog/BlogCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/blog/BlogCard.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/blog/BlogSection.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/blog/BlogSection.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/product/ProductCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/product/ProductCard.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/quiz/OptionCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/quiz/OptionCard.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/quiz/ResultsGrid.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/quiz/ResultsGrid.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/quiz/StepShell.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/quiz/StepShell.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -112,7 +96,7 @@
       <workItem from="1754296079734" duration="7973000" />
       <workItem from="1754412689739" duration="8343000" />
       <workItem from="1754765189848" duration="11144000" />
-      <workItem from="1755070985098" duration="37528000" />
+      <workItem from="1755070985098" duration="37985000" />
     </task>
     <servers />
   </component>

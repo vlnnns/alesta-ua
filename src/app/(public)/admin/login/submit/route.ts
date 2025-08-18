@@ -10,30 +10,49 @@ export async function POST(req: Request) {
     const password = String(form.get('password') ?? '')
     const nextRaw = form.get('next')
 
-    // Санітизуємо next, щоб не було Invalid URL і відкритих редіректів
-    const next =
-        typeof nextRaw === 'string' && nextRaw.startsWith('/') && !nextRaw.startsWith('/admin/login')
-            ? nextRaw
-            : '/admin'
-
-    const okUser = process.env.ADMIN_USER || 'admin'
-    const okPass = process.env.ADMIN_PASS || 'password'
-    if (username !== okUser || password !== okPass) {
-        const url = new URL('/admin/login', req.url)
-        url.searchParams.set('err', 'creds')
-        url.searchParams.set('next', next)
-        return NextResponse.redirect(url)
+    // Resolve & validate "next" to avoid invalid URL and open redirects
+    let nextPath = '/admin'
+    if (typeof nextRaw === 'string') {
+        try {
+            const current = new URL(req.url)
+            const resolved = new URL(nextRaw, current) // handles relative/absolute safely
+            const sameOrigin = resolved.origin === current.origin
+            const notLogin = !resolved.pathname.startsWith('/admin/login')
+            const notSchemeRelative = !nextRaw.startsWith('//')
+            if (sameOrigin && notLogin && notSchemeRelative) {
+                nextPath = resolved.pathname + resolved.search + resolved.hash
+            }
+        } catch {
+            /* keep default /admin */
+        }
     }
 
-    const exp = Math.floor(Date.now() / 1000) + 60 * 60 * 8 // 8 год
+    const okUser = process.env.ADMIN_USER
+    const okPass = process.env.ADMIN_PASS
+    if (process.env.NODE_ENV === 'production' && (!okUser || !okPass)) {
+        return NextResponse.json({ error: 'Admin credentials not configured' }, { status: 500 })
+    }
+
+    // tiny delay to reduce brute-force (optional)
+    await new Promise(r => setTimeout(r, 150))
+
+    if (username !== (okUser ?? 'admin') || password !== (okPass ?? 'password')) {
+        const url = new URL('/admin/login', req.url)
+        url.searchParams.set('err', 'creds')
+        url.searchParams.set('next', nextPath)
+        return NextResponse.redirect(url, { status: 303 })
+    }
+
+    const exp = Math.floor(Date.now() / 1000) + 60 * 60 * 8 // 8 hours
     const token = await signToken('admin', exp, process.env.AUTH_SECRET || 'dev-secret')
 
-    const res = NextResponse.redirect(new URL(next, req.url))
-    res.headers.append(
-        'Set-Cookie',
-        `admin_session=${token}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${60 * 60 * 8}; ${
-            process.env.NODE_ENV === 'production' ? 'Secure; ' : ''
-        }`
-    )
+    const res = NextResponse.redirect(new URL(nextPath, req.url), { status: 303 })
+    res.cookies.set('admin_session', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',      // stricter for admin areas
+        path: '/',
+        maxAge: 60 * 60 * 8,
+    })
     return res
 }
