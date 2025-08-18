@@ -1,11 +1,50 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { submitOrder, type CheckoutPayload } from './actions'
 import { useCart } from '@/components/cart/CartProvider'
 import Image from 'next/image'
 import Link from 'next/link'
+
+/* ---------- helpers: phone mask & validation ---------- */
+
+const onlyDigits = (s: string) => s.replace(/\D/g, '')
+
+/** Нормализует к виду +380XXXXXXXXX (только цифры Украины) */
+function normalizeUA(raw: string) {
+    let d = onlyDigits(raw)
+
+    // 0XXXXXXXXX  -> 380XXXXXXXXX
+    if (d.startsWith('0') && d.length >= 10) d = '38' + d
+    // 9XXXXXXXX -> 3809XXXXXXXX (когда пользователь набрал без +380/0)
+    else if (!d.startsWith('380')) d = '380' + d
+
+    d = d.slice(0, 12) // 380 + 9 цифр
+    return '+' + d
+}
+
+function isValidUA(raw: string) {
+    const n = normalizeUA(raw)
+    return /^\+380\d{9}$/.test(n)
+}
+
+/** Маска при вводе: +380 (XX) XXX-XX-XX */
+function formatUA(raw: string) {
+    const n = normalizeUA(raw).replace('+', '') // 380XXXXXXXXX
+    const tail = n.slice(3) // после 380
+    let out = '+380'
+
+    if (!tail) return out
+    out += ' (' + tail.slice(0, 2)
+    if (tail.length >= 2) out += ')'
+    if (tail.length > 2) out += ' ' + tail.slice(2, 5)
+    if (tail.length > 5) out += '-' + tail.slice(5, 7)
+    if (tail.length > 7) out += '-' + tail.slice(7, 9)
+    return out
+}
+
+/* ---------- компонент ---------- */
 
 export default function CheckoutPage() {
     const router = useRouter()
@@ -17,7 +56,7 @@ export default function CheckoutPage() {
     const [form, setForm] = useState({
         customerName: '',
         email: '',
-        phone: '',
+        phone: '+380', // старт маски
         city: '',
         address: '',
         warehouse: '',
@@ -26,19 +65,50 @@ export default function CheckoutPage() {
         companyCode: '',
     })
 
+    /* ----- города (лениво из public/ua-cities.json) ----- */
+    const [cities, setCities] = useState<string[]>([])
+    useEffect(() => {
+        // разместите файл по пути /public/ua-cities.json (см. ниже)
+        fetch('/ua-cities.json')
+            .then(r => r.ok ? r.json() : [])
+            .then((list: string[]) => {
+                if (Array.isArray(list)) {
+                    const sorted = [...list].sort((a, b) => a.localeCompare(b, 'uk'))
+                    setCities(sorted)
+                }
+            })
+            .catch(() => {}) // без падений, просто не покажем список
+    }, [])
+
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         setError(null)
+
+        // простая фронт-валидация
+        if (form.customerName.trim().length < 2) {
+            setError('Вкажіть коректне імʼя та прізвище.')
+            return
+        }
+        if (!isValidUA(form.phone)) {
+            setError('Перевірте номер телефону у форматі +380XXXXXXXXX.')
+            return
+        }
+        if (!form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+            setError('Перевірте email.')
+            return
+        }
+        if (!form.city) {
+            setError('Оберіть або введіть місто.')
+            return
+        }
+
         setLoading(true)
 
-        // перетворюємо id у number і валідимо
         const itemsPayload = items.map(it => {
             const productId = Number(it.productId)
-            if (!Number.isFinite(productId)) {
-                throw new Error('Bad productId in cart')
-            }
+            if (!Number.isFinite(productId)) throw new Error('Bad productId in cart')
             return {
-                id: productId, // то, что ждёт бекенд
+                id: productId,
                 title: it.title,
                 image: it.image,
                 price: it.price,
@@ -52,9 +122,9 @@ export default function CheckoutPage() {
             }
         })
 
-
         const payload: CheckoutPayload = {
             ...form,
+            phone: normalizeUA(form.phone), // нормализованный номер для бэка
             items: itemsPayload,
             total: subtotal,
         }
@@ -75,6 +145,9 @@ export default function CheckoutPage() {
     const input =
         'w-full rounded-xl border border-neutral-200 bg-white px-3 py-2 outline-none focus:ring-2 focus:ring-[#D08B4C]/30 focus:border-[#D08B4C]'
 
+    // посчитаем цену красиво
+    const subtotalFmt = useMemo(() => new Intl.NumberFormat('uk-UA').format(subtotal), [subtotal])
+
     return (
         <main className="px-4 sm:px-6 py-10 mt-12 bg-neutral-50 text-neutral-900">
             <div className="mx-auto max-w-6xl">
@@ -88,7 +161,7 @@ export default function CheckoutPage() {
                         </Link>
                     </div>
                 ) : (
-                    <form onSubmit={onSubmit} className="grid gap-8 md:grid-cols-12">
+                    <form onSubmit={onSubmit} className="grid gap-6 md:grid-cols-12">
                         {/* Form */}
                         <section className="md:col-span-8 space-y-6">
                             {/* Контакти */}
@@ -99,43 +172,81 @@ export default function CheckoutPage() {
                                         Ім’я та прізвище *
                                         <input
                                             className={input}
+                                            autoComplete="name"
                                             value={form.customerName}
                                             onChange={(e) => setForm({ ...form, customerName: e.target.value })}
                                             required
                                         />
                                     </label>
+
                                     <label className={label}>
                                         Телефон *
                                         <input
                                             type="tel"
+                                            inputMode="tel"
+                                            pattern="^\+380\d{9}$"
                                             className={input}
                                             value={form.phone}
-                                            onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                                            placeholder="+380..."
+                                            onChange={(e) => setForm({ ...form, phone: formatUA(e.target.value) })}
+                                            onBlur={(e) => setForm(f => ({ ...f, phone: formatUA(e.target.value) }))}
+                                            placeholder="+380 (__) ___-__-__"
+                                            autoComplete="tel"
                                             required
                                         />
+
                                     </label>
+
                                     <label className={label}>
                                         Email *
                                         <input
                                             type="email"
                                             className={input}
+                                            autoComplete="email"
                                             value={form.email}
                                             onChange={(e) => setForm({ ...form, email: e.target.value })}
                                             required
                                         />
                                     </label>
 
-                                    {/* Місто (обов’язково — потрібно на сервері) */}
+                                    {/* Місто: select як інші поля (з іконкою-стрілкою) */}
                                     <label className={label}>
                                         Місто *
-                                        <input
-                                            className={input}
-                                            value={form.city}
-                                            onChange={(e) => setForm({ ...form, city: e.target.value })}
-                                            required
-                                        />
+                                        {cities.length > 0 ? (
+                                            <div className="relative">
+                                                <select
+                                                    id="city"
+                                                    className={`${input} appearance-none pr-10`}
+                                                    value={form.city}
+                                                    onChange={(e) => setForm({ ...form, city: e.target.value })}
+                                                    autoComplete="address-level2"
+                                                    required
+                                                >
+                                                    <option value="">Оберіть місто…</option>
+                                                    {cities.map((c) => (
+                                                        <option key={c} value={c}>{c}</option>
+                                                    ))}
+                                                </select>
+
+                                                {/* своя стрілка, щоб select виглядав як інші інпути */}
+                                                <svg
+                                                    className="pointer-events-none absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-neutral-400"
+                                                    viewBox="0 0 24 24" fill="none" aria-hidden="true"
+                                                >
+                                                    <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                                </svg>
+                                            </div>
+                                        ) : (
+                                            <input
+                                                className={input}
+                                                placeholder="Почніть вводити місто"
+                                                value={form.city}
+                                                onChange={(e) => setForm({ ...form, city: e.target.value })}
+                                                autoComplete="address-level2"
+                                                required
+                                            />
+                                        )}
                                     </label>
+
                                 </div>
                             </div>
 
@@ -151,7 +262,6 @@ export default function CheckoutPage() {
                                     />
                                 </label>
                             </div>
-
 
                             {error && (
                                 <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -195,7 +305,7 @@ export default function CheckoutPage() {
                                 <div className="my-4 h-px bg-neutral-200" />
                                 <div className="flex items-center justify-between">
                                     <span className="text-neutral-600">Разом</span>
-                                    <span className="text-xl font-semibold">₴{subtotal}</span>
+                                    <span className="text-xl font-semibold">₴{subtotalFmt}</span>
                                 </div>
                             </div>
                         </aside>

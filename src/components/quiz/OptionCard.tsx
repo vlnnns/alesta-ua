@@ -19,7 +19,7 @@ export default function OptionCard({ option, isActive, onClick }: Props) {
             role="radio"
             aria-checked={isActive}
             className={`
-        group relative text-left rounded-xl border overflow-hidden
+        group relative text-left rounded-md border overflow-hidden
         transition-all duration-200 focus:outline-none bg-white
         min-w-[170px] max-w-[170px] aspect-[5/4]
         ${isActive

@@ -46,9 +46,10 @@ export default function ReviewsCarousel() {
             <div className="max-w-7xl mx-auto">
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-3xl font-bold text-black">Відгуки наших клієнтів</h2>
-                    <button className="bg-[#D08B4C] hover:bg-[#c57b37] text-white px-6 py-2 rounded-md font-medium">
+                    <a href="https://www.google.com/maps/place/Alesta+UA+-+Veneer+Factory/@49.1311088,24.7397875,17z/data=!4m8!3m7!1s0x47309289333a1b33:0x899c932e327c2c18!8m2!3d49.1311088!4d24.7423624!9m1!1b1!16s%2Fg%2F11hbp9vx6w!5m1!1e4?entry=ttu&g_ep=EgoyMDI1MDgxMy4wIKXMDSoASAFQAw%3D%3D" className="bg-[#D08B4C] hover:bg-[#c57b37] text-white px-6 py-2 rounded-md font-medium">
                         Залишити відгук
-                    </button>
+
+                    </a>
                 </div>
 
                 <div className="flex items-center gap-8 mb-8">
@@ -63,14 +64,13 @@ export default function ReviewsCarousel() {
                 <div className="relative">
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                         {visibleReviews.map((r, i) => (
-                            <div key={i} className="bg-gray-50 rounded-xl p-4 shadow-sm">
+                            <div key={i} className="bg-[#F5F5F5] rounded-md p-4">
                                 <p className="font-semibold text-[#222] mb-1">{r.name}</p>
                                 <div className="flex items-center text-orange-400 mb-1">
                                     {Array.from({length: r.rating}).map((_, i) => <FaStar key={i}/>)}
                                 </div>
                                 <p className="text-sm text-gray-400 mb-2">{r.date}</p>
                                 <p className="text-gray-700 text-sm leading-relaxed">{r.text}</p>
-                                <p className="mt-4 text-sm underline text-gray-400">Читати повністю</p>
                             </div>
                         ))}
                     </div>

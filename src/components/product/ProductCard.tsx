@@ -40,6 +40,44 @@ function useEnsureCurrent<T>(arr: T[] | undefined, current: T) {
     }, [arr, current])
 }
 
+function StockBadge({
+                        inStock,
+                        className = '',
+                        size = 'md',
+                    }: { inStock: boolean; className?: string; size?: 'sm' | 'md' }) {
+    const sizing = size === 'sm'
+        ? 'px-2.5 py-0.5 text-[11px]'
+        : 'px-3 py-1 text-xs'
+
+    const ok = inStock
+        ? 'bg-emerald-50/80 text-emerald-800 ring-1 ring-emerald-200/70 shadow-sm'
+        : 'bg-neutral-100/80 text-neutral-600 ring-1 ring-neutral-200/70'
+
+    return (
+        <span
+            className={[
+                'inline-flex items-center gap-1.5 rounded-full backdrop-blur',
+                sizing, ok, className,
+            ].join(' ')}
+            title={inStock ? 'В наявності' : 'Немає в наявності'}
+        >
+      {inStock ? (
+          <>
+              <span className="font-medium">В наявності</span>
+          </>
+      ) : (
+          <>
+              {/* іконка «нема» */}
+              <svg className="h-3.5 w-3.5 text-neutral-500" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+              </svg>
+              <span className="font-medium">Немає</span>
+          </>
+      )}
+    </span>
+    )
+}
+
 export default function ProductCard({
                                         product,
                                         isOpen = false,
@@ -77,9 +115,10 @@ export default function ProductCard({
     return (
         <div
             className={[
-                'relative isolate overflow-hidden rounded-2xl bg-white text-black border border-neutral-200/70',
-                // без теней и колец:
-                'transition-transform duration-300 ease-out transform-gpu hover:-translate-y-0.5',
+                'relative isolate overflow-hidden rounded-md',
+                'h-full min-h-[260px] p-6 transition-shadow',
+                'bg-white/90 backdrop-blur-sm', // полупрозрачный фон
+                'text-black border border-neutral-200/70',
                 className,
             ].join(' ')}
             style={{ height: fixedHeight }}
@@ -93,29 +132,14 @@ export default function ProductCard({
                 ].join(' ')}
             >
                 {/* Header */}
-                <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-neutral-900">
+                <div className="mb-2 flex items-center gap-2 text-md font-semibold text-neutral-900">
           <span className="truncate">
             {product.type} {product.thickness} мм
           </span>
 
-                    {/* обновлённый чип наличия */}
-                    <span
-                        className={[
-                            'ml-auto inline-flex items-center gap-1.5 rounded-md border-2 px-2.5 py-0.5 text-xs font-medium',
-                            inStock
-                                ? 'border-emerald-300 bg-emerald-50 text-emerald-800'
-                                : 'border-neutral-300 bg-neutral-100 text-neutral-600',
-                        ].join(' ')}
-                        title={inStock ? 'В наявності' : 'Немає в наявності'}
-                    >
-            <span
-                className={[
-                    'h-1.5 w-1.5 rounded-full',
-                    inStock ? 'bg-emerald-500' : 'bg-neutral-400',
-                ].join(' ')}
-            />
-                        {inStock ? 'В наявності' : 'Немає'}
-          </span>
+                    <StockBadge inStock={inStock} className="ml-auto" />
+
+
                 </div>
 
                 {/* Image на весь доступный размер */}
@@ -136,7 +160,7 @@ export default function ProductCard({
 
 
                 {/* Meta */}
-                <div className="text-sm text-neutral-600 space-y-1">
+                <div className="text-sm text-neutral-600 space-y-0">
                     <div>
                         {product.grade}
                         {product.waterproofing ? `, ${product.waterproofing}` : ''}
@@ -180,31 +204,17 @@ export default function ProductCard({
             {/* EDIT */}
             <div
                 className={[
-                    'absolute inset-0 flex flex-col justify-between p-4 bg-white',
+                    'absolute inset-0 flex flex-col justify-between p-4 bg-white/90',
                     'transition-transform duration-500 ease-out',
                     isOpen ? 'translate-y-0' : 'translate-y-full',
                 ].join(' ')}
             >
-                <div className="space-y-2">
+                <div className="space-y-1">
                     <h3 className="mb-2 flex items-center gap-2 text-lg font-semibold text-neutral-900">
                         {/* Убрали слово “Фанера” */}
                         {product.type} {product.thickness} мм
-                        <span
-                            className={[
-                                'ml-auto inline-flex items-center gap-1.5 rounded-md border-2 px-2.5 py-0.5 text-[11px] font-medium',
-                                inStock
-                                    ? 'border-emerald-300 bg-emerald-50 text-emerald-800'
-                                    : 'border-neutral-300 bg-neutral-100 text-neutral-600',
-                            ].join(' ')}
-                        >
-              <span
-                  className={[
-                      'h-1.5 w-1.5 rounded-full',
-                      inStock ? 'bg-emerald-500' : 'bg-neutral-400',
-                  ].join(' ')}
-              />
-                            {inStock ? 'В наявності' : 'Немає'}
-            </span>
+                        <StockBadge inStock={inStock} className="ml-auto" size="sm" />
+
                     </h3>
 
                     <Select

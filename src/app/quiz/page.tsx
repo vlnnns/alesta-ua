@@ -75,7 +75,7 @@ export default function QuizPage() {
     const currentValue = (currentField ? answers[currentField as keyof Answers] : '') ?? ''
 
     return (
-        <div className="mx-auto px-4 py-12 bg-white flex flex-col items-center">
+        <div className="mx-auto px-6 py-12 bg-white flex flex-col items-center">
             {/* Header */}
             <div className="text-center max-w-5xl mx-auto mb-10">
                 <h1 className="text-4xl sm:text-5xl font-extrabold leading-tight text-black">
@@ -87,7 +87,7 @@ export default function QuizPage() {
             </div>
 
             {/* Card container: одна высота для шагов и результатов */}
-            <div className="min-h-[520px] flex items-stretch justify-center w-full max-w-5xl">
+            <div className="min-h-[520px] flex items-stretch justify-center w-full max-w-5xl ">
                 {step < steps.length ? (
                     <div className="w-full">
                         <QuizStep
@@ -117,7 +117,7 @@ export default function QuizPage() {
                     />
                 ) : (
                     <div className="text-center text-gray-600 flex flex-col items-center justify-center w-full py-12">
-                        <p className="text-lg font-medium mb-2">Не знайдено відповідних товарів 😔</p>
+                        <p className="text-lg font-medium mb-2">Не знайдено відповідних товарів</p>
                         <p className="text-sm text-gray-400 mb-6">Спробуйте змінити один з параметрів підбору.</p>
                         <button
                             onClick={() => setStep(steps.length - 1)}

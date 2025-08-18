@@ -32,20 +32,20 @@ export default function Footer() {
 
                         <div className="space-y-5 text-sm sm:text-base">
                             <div>
-                                <div className="text-neutral-400">+380 (00)-000-00-00</div>
+                                <div className="text-neutral-400">+38 (067) 767 7077</div>
                                 <div className="text-neutral-500">Якщо є запитання</div>
                             </div>
 
                             <div>
                                 <div className="font-medium">Електронна пошта:</div>
-                                <a href="mailto:info@alesta.ua" className="text-neutral-300 hover:text-white transition">
-                                    info@alesta.ua
+                                <a href="mailto:info@alestaua.com" className="text-neutral-300 hover:text-white transition">
+                                    info@alestaua.com
                                 </a>
                             </div>
 
                             <div>
                                 <div className="font-medium">Адреса:</div>
-                                <div className="text-neutral-300">м. Київ</div>
+                                <div className="text-neutral-300"> Vul. Dmytra Vitovsʹkoho,Halych, Ivano-Frankivska oblast, Ukrayna, Галич, Івано-Франківська область, 77100</div>
                             </div>
                         </div>
                     </div>

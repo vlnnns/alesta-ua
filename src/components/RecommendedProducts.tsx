@@ -86,7 +86,7 @@ export default function RecommendedProducts() {
     }
 
     return (
-        <section className="bg-black bg-cover bg-center py-16 px-6 text-white">
+        <section className="bg-[#202020] bg-cover bg-center py-16 px-6 text-white">
             <div className="max-w-7xl mx-auto">
                 <h2 className="text-3xl font-bold mb-10">Рекомендовані товари</h2>
 
@@ -105,7 +105,7 @@ export default function RecommendedProducts() {
                                 isOpen={!!expanded[p.id]}
                                 onToggle={() => toggle(p.id)}
                                 options={options}
-                                onSubmit={handleSubmit}   // 👈 теперь добавляет
+                                onSubmit={handleSubmit}
                                 fixedHeight={420}
                                 className="basis-[280px] grow-0 shrink-0"
                             />

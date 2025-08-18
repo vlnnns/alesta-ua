@@ -51,7 +51,7 @@ export default async function CatalogPage({
     })
 
     return (
-        <main className="bg-white text-neutral-800">
+        <main className="bg-[#F5F5F5] text-neutral-800">
             <div className="w-full px-4 sm:px-6 py-10 max-w-7xl mx-auto">
                 {/* breadcrumbs */}
                 <nav className="text-sm text-neutral-500 mb-6">
@@ -85,7 +85,7 @@ export default async function CatalogPage({
                                     className={[
                                         'block w-full rounded-xl px-4 py-2 border transition',
                                         typeParam === 'all'
-                                            ? 'border-[#D08B4C] bg-[#FFF9F3] text-neutral-900'
+                                            ? 'border-[#D08B4C] bg-white text-neutral-900'
                                             : 'border-neutral-200 hover:border-neutral-300',
                                     ].join(' ')}
                                 >
@@ -103,7 +103,7 @@ export default async function CatalogPage({
                                             className={[
                                                 'block w-full rounded-xl px-4 py-2 border transition',
                                                 active
-                                                    ? 'border-[#D08B4C] bg-[#FFF9F3] text-neutral-900'
+                                                    ? 'border-[#D08B4C] bg-white text-neutral-900'
                                                     : 'border-neutral-200 hover:border-neutral-300',
                                             ].join(' ')}
                                         >

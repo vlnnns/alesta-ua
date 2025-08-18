@@ -1,21 +1,23 @@
 'use client'
 
-import BlogCard from '@/components/blog/BlogCard'         // value import (НЕ import type)
-import { blogPosts } from '@/data/blog'                   // value import
+import BlogCard from '@/components/blog/BlogCard'
+import { blogPosts } from '@/data/blog'
 
 export default function BlogSection() {
-    // возьмём 3 поста для секции: большой слева + две карточки справа
     const [hero, light, dark] = blogPosts
 
     return (
         <section className="px-4 sm:px-6 py-10 bg-white">
-            <div className="max-w-7xl mx-auto grid gap-6 md:grid-cols-2">
-                <div className="">
+            <div className="mx-auto max-w-7xl grid gap-6 md:grid-cols-3 md:auto-rows-[260px]">
+                <div className="md:col-span-2 md:row-span-2">
                     <BlogCard post={hero} variant="hero" />
                 </div>
 
-                <div className="flex flex-col gap-6">
+                <div>
                     <BlogCard post={light} variant="light" />
+                </div>
+
+                <div>
                     <BlogCard post={dark} variant="dark" />
                 </div>
             </div>

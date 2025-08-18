@@ -30,20 +30,17 @@ export default function ContactSection({
                                            titleLeft = "ЗВ’ЯЖІТЬСЯ",
                                            titleRight = 'З НАМИ',
                                            description = 'Маєте запитання, бажаєте уточнити деталі замовлення чи отримати консультацію щодо підбору фанери? Ми завжди на зв’язку та раді допомогти!',
-                                           email = 'hello@relume.io',
-                                           phone = '+1 (555) 000-0000',
-                                           address = '123 Sample St, Sydney NSW 2000 AU',
+                                           email = 'info@alestaua.com',
+                                           phone = '+38 (067) 767 7077',
+                                           address = ' Vul. Dmytra Vitovsʹkoho,Halych, Ivano-Frankivs\'ka oblast, Ukrayna, Галич, Івано-Франківська область, 77100',
                                            id = 'contacts',
                                            className = '',
                                        }: Props) {
     return (
         <section
             id={id}
-            className={`relative px-4 sm:px-6 py-12 sm:py-16 bg-[#151515] text-white ${className} overflow-hidden`}
+            className={`relative px-4 sm:px-6 py-12 bg-[#151515] text-white ${className} overflow-hidden`}
         >
-            {/* мягкие размытые акценты */}
-            <div className="pointer-events-none absolute -top-28 -left-24 h-72 w-72 rounded-full bg-[#D08B4C]/15 blur-3xl" />
-            <div className="pointer-events-none absolute -bottom-28 -right-24 h-80 w-80 rounded-full bg-white/10 blur-3xl" />
 
             <div className="relative mx-auto max-w-7xl grid items-start gap-10 lg:gap-16 grid-cols-1 lg:grid-cols-2">
                 {/* Left: heading + text */}

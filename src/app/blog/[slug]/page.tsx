@@ -36,7 +36,7 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
           {post.category}
         </span>
                 <h1 className="mt-4 text-3xl sm:text-5xl font-semibold tracking-tight">{post.title}</h1>
-                <p className="mt-3 text-neutral-600">{new Date(post.publishedAt).toLocaleDateString()}</p>
+                <p className="mt-1 text-neutral-600">{new Date(post.publishedAt).toLocaleDateString()}</p>
 
                 <div className="relative mt-8 w-full aspect-[16/9] overflow-hidden rounded-2xl h-[250px]">
                     <Image
