@@ -65,7 +65,6 @@ export default function ProductCard({
         setWaterproofing(product.waterproofing)
     }, [product])
 
-    // inStock у старих сидів може бути відсутній → вважаємо true за замовчуванням
     const inStock = product.inStock !== false
 
     const optTypes = useEnsureCurrent(options?.types, product.type)
@@ -77,68 +76,97 @@ export default function ProductCard({
 
     return (
         <div
-            className={`bg-white rounded-xl text-black overflow-hidden relative transition-all border hover:shadow-md ${className}`}
+            className={[
+                'relative isolate overflow-hidden rounded-2xl bg-white text-black border border-neutral-200/70',
+                // без теней и колец:
+                'transition-transform duration-300 ease-out transform-gpu hover:-translate-y-0.5',
+                className,
+            ].join(' ')}
             style={{ height: fixedHeight }}
         >
             {/* VIEW */}
             <div
-                className={`absolute inset-0 flex flex-col p-4 transition-transform duration-500 ease-in-out ${
-                    isOpen ? '-translate-y-full' : 'translate-y-0'
-                }`}
+                className={[
+                    'absolute inset-0 flex min-h-0 flex-col p-4',
+                    'transition-transform duration-500 ease-out',
+                    isOpen ? '-translate-y-full' : 'translate-y-0',
+                ].join(' ')}
             >
-                <div className="text-sm font-semibold mb-2 text-neutral-800 flex items-center gap-2">
-                    {product.type} {product.thickness} мм
+                {/* Header */}
+                <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-neutral-900">
+          <span className="truncate">
+            {product.type} {product.thickness} мм
+          </span>
+
+                    {/* обновлённый чип наличия */}
                     <span
-                        className={`ml-auto inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium ${
-                            inStock ? 'bg-green-100 text-green-700' : 'bg-neutral-200 text-neutral-700'
-                        }`}
+                        className={[
+                            'ml-auto inline-flex items-center gap-1.5 rounded-md border-2 px-2.5 py-0.5 text-xs font-medium',
+                            inStock
+                                ? 'border-emerald-300 bg-emerald-50 text-emerald-800'
+                                : 'border-neutral-300 bg-neutral-100 text-neutral-600',
+                        ].join(' ')}
                         title={inStock ? 'В наявності' : 'Немає в наявності'}
                     >
-            {inStock ? 'В наявності' : 'Немає'}
+            <span
+                className={[
+                    'h-1.5 w-1.5 rounded-full',
+                    inStock ? 'bg-emerald-500' : 'bg-neutral-400',
+                ].join(' ')}
+            />
+                        {inStock ? 'В наявності' : 'Немає'}
           </span>
                 </div>
 
-                <div className="w-full h-48 bg-neutral-100 rounded-md overflow-hidden mb-4 relative">
+                {/* Image на весь доступный размер */}
+                <div className="relative mb-4 flex-1 min-h-[180px] rounded-xl overflow-hidden border border-neutral-200/60">
                     <Image
                         src={product.image}
                         alt={product.type}
                         fill
                         sizes="(max-width: 768px) 100vw, 33vw"
-                        className="object-contain"
+                        className="object-cover"
                     />
                     {!inStock && (
-                        <div className="absolute inset-x-0 bottom-0 bg-black/40 text-white text-xs text-center py-1">
+                        <div className="absolute inset-x-0 bottom-0 bg-black/45 text-white text-xs text-center py-1">
                             Немає в наявності
                         </div>
                     )}
                 </div>
 
-                <div className="text-sm text-neutral-600">
-                    <div className="mb-1">
+
+                {/* Meta */}
+                <div className="text-sm text-neutral-600 space-y-1">
+                    <div>
                         {product.grade}
                         {product.waterproofing ? `, ${product.waterproofing}` : ''}
                     </div>
-                    <div className="mb-1">{product.format}</div>
-                    <div className="mb-2">{product.manufacturer}</div>
+                    <div>{product.format}</div>
+                    <div>{product.manufacturer}</div>
                 </div>
 
-                <div className="mt-auto flex justify-between items-center">
+                {/* Footer */}
+                <div className="mt-auto flex items-center justify-between pt-3">
                     <p
-                        className={`font-semibold ${
-                            inStock ? 'text-neutral-900' : 'text-neutral-400 line-through'
-                        }`}
+                        className={[
+                            'font-semibold',
+                            inStock ? 'text-neutral-900' : 'text-neutral-400 line-through',
+                        ].join(' ')}
                     >
                         ₴{product.price} / лист
                     </p>
+
                     {onToggle && (
                         <button
                             onClick={onToggle}
                             disabled={!inStock}
-                            className={`w-8 h-8 flex items-center justify-center rounded text-lg ${
+                            className={[
+                                'cursor-pointer w-8 h-8 rounded text-lg grid place-items-center',
+                                'transition-colors duration-200',
                                 inStock
                                     ? 'bg-[#D08B4C] text-white hover:bg-[#c57b37]'
-                                    : 'bg-neutral-300 text-white cursor-not-allowed'
-                            }`}
+                                    : 'bg-neutral-300 text-white cursor-not-allowed',
+                            ].join(' ')}
                             aria-disabled={!inStock}
                             aria-label={inStock ? 'Налаштувати та додати' : 'Немає в наявності'}
                             title={inStock ? 'Налаштувати та додати' : 'Немає в наявності'}
@@ -151,19 +179,31 @@ export default function ProductCard({
 
             {/* EDIT */}
             <div
-                className={`absolute inset-0 p-4 flex flex-col justify-between bg-white transition-transform duration-500 ease-in-out ${
-                    isOpen ? 'translate-y-0' : 'translate-y-full'
-                }`}
+                className={[
+                    'absolute inset-0 flex flex-col justify-between p-4 bg-white',
+                    'transition-transform duration-500 ease-out',
+                    isOpen ? 'translate-y-0' : 'translate-y-full',
+                ].join(' ')}
             >
-                <div className="space-y-1">
-                    <h3 className="text-lg font-semibold mb-2 text-neutral-900 flex items-center gap-2">
-                        Фанера {product.type} {product.thickness} мм
+                <div className="space-y-2">
+                    <h3 className="mb-2 flex items-center gap-2 text-lg font-semibold text-neutral-900">
+                        {/* Убрали слово “Фанера” */}
+                        {product.type} {product.thickness} мм
                         <span
-                            className={`ml-auto inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium ${
-                                inStock ? 'bg-green-100 text-green-700' : 'bg-neutral-200 text-neutral-700'
-                            }`}
+                            className={[
+                                'ml-auto inline-flex items-center gap-1.5 rounded-md border-2 px-2.5 py-0.5 text-[11px] font-medium',
+                                inStock
+                                    ? 'border-emerald-300 bg-emerald-50 text-emerald-800'
+                                    : 'border-neutral-300 bg-neutral-100 text-neutral-600',
+                            ].join(' ')}
                         >
-              {inStock ? 'В наявності' : 'Немає'}
+              <span
+                  className={[
+                      'h-1.5 w-1.5 rounded-full',
+                      inStock ? 'bg-emerald-500' : 'bg-neutral-400',
+                  ].join(' ')}
+              />
+                            {inStock ? 'В наявності' : 'Немає'}
             </span>
                     </h3>
 
@@ -208,23 +248,23 @@ export default function ProductCard({
                         options={optGrades.map(v => ({ value: v, label: v }))}
                     />
 
-                    {/* виробник не змінюємо тут, але зберігаємо поточний */}
                     <input type="hidden" value={manufacturer} readOnly />
                     {!inStock && (
-                        <p className="text-xs text-red-600 mt-2">Товар наразі відсутній — додавання до кошика вимкнено.</p>
+                        <p className="mt-2 text-xs text-red-600">
+                            Товар наразі відсутній — додавання до кошика вимкнено.
+                        </p>
                     )}
                 </div>
 
-                <div className="flex justify-between items-center mt-4">
-                    <p className="font-semibold text-base text-neutral-900">
-                        ₴{product.price} / лист
-                    </p>
+                <div className="mt-4 flex items-center justify-between">
+                    <p className="text-base font-semibold text-neutral-900">₴{product.price} / лист</p>
                     <div className="flex gap-2">
                         {onToggle && (
                             <button
                                 onClick={onToggle}
-                                className="w-10 h-10 flex items-center justify-center border rounded text-gray-600 hover:bg-gray-100"
+                                className="cursor-pointer w-8 h-8 grid place-items-center rounded border border-neutral-300 text-neutral-600 hover:bg-neutral-100 transition-colors"
                                 aria-label="Закрити"
+                                title="Закрити"
                             >
                                 ✕
                             </button>
@@ -242,11 +282,12 @@ export default function ProductCard({
                                 })
                             }
                             disabled={!inStock}
-                            className={`w-10 h-10 flex items-center justify-center rounded ${
+                            className={[
+                                'cursor-pointer w-8 h-8 grid place-items-center rounded transition-colors',
                                 inStock
                                     ? 'bg-[#D08B4C] text-white hover:bg-[#c57b37]'
-                                    : 'bg-neutral-300 text-white cursor-not-allowed'
-                            }`}
+                                    : 'bg-neutral-300 text-white cursor-not-allowed',
+                            ].join(' ')}
                             aria-disabled={!inStock}
                             aria-label={inStock ? 'Додати до кошика' : 'Немає в наявності'}
                             title={inStock ? 'Додати до кошика' : 'Немає в наявності'}
@@ -275,11 +316,16 @@ function Select<T extends string>({
     className?: string
 }) {
     return (
-        <label className={`block text-sm ${className ?? ''}`}>
-            <span className="block text-neutral-600 mb-1">{label}</span>
+        <label className={['block text-sm', className ?? ''].join(' ')}>
+            <span className="mb-1 block text-neutral-600">{label}</span>
             <div className="relative">
                 <select
-                    className="w-full border rounded px-3 py-2 pr-8 text-sm text-neutral-900 bg-white appearance-none focus:outline-none focus:ring-2 focus:ring-[#D08B4C]/30 focus:border-[#D08B4C]"
+                    className={[
+                        'w-full rounded-md border border-neutral-200 bg-white/70 text-sm text-neutral-900',
+                        'px-3 py-2 pr-8 appearance-none',
+                        'focus:outline-none focus:ring-2 focus:ring-[#D08B4C]/30 focus:border-[#D08B4C]',
+                        'transition-colors',
+                    ].join(' ')}
                     value={value}
                     onChange={(e) => onChange(e.target.value)}
                 >

@@ -24,3 +24,50 @@ model PlywoodProduct {
 
   @@unique([type, thickness, format, grade, manufacturer])
 }
+
+enum DeliveryMethod {
+  pickup
+  nova_poshta_warehouse
+  nova_poshta_courier
+  none
+}
+
+// prisma/schema.prisma
+model Order {
+  id             Int            @id @default(autoincrement())
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  customerName   String
+  email          String
+  phone          String
+  city           String
+  address        String?
+  warehouse      String?
+  comment        String?
+  companyName    String?
+  companyCode    String?
+  total          Int
+  items          OrderItem[]
+  deliveryMethod DeliveryMethod @default(pickup)
+
+  @@map("orders") // необязательно, но удобно (избегаем слова ORDER в SQL)
+}
+
+model OrderItem {
+  id            Int     @id @default(autoincrement())
+  orderId       Int
+  productId     Int
+  title         String
+  image         String?
+  price         Int
+  quantity      Int
+  type          String?
+  thickness     Float?
+  format        String?
+  grade         String?
+  manufacturer  String?
+  waterproofing String?
+  order         Order   @relation(fields: [orderId], references: [id])
+
+  @@map("order_items")
+}

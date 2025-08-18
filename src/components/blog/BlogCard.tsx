@@ -96,7 +96,7 @@ export default function BlogCard({ post, variant = 'light', className }: Props) 
                 className
             )}
         >
-      <span className="inline-block text-[11px] px-3 py-1 rounded-full bg-black/5 text-neutral-800">
+      <span className="inline-block text-[11px] px-3 py-1 rounded-full bg-black/5">
         {post.category}
       </span>
             <h3 className="mt-4 text-xl font-semibold text-neutral-800">{post.title}</h3>

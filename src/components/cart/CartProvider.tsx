@@ -29,15 +29,29 @@ export function CartProvider({ children }: { children: ReactNode }) {
     // hydrate from localStorage
     useEffect(() => {
         try {
-            const raw = localStorage.getItem(LS_KEY)
-            if (raw) {
-                const parsed = JSON.parse(raw) as unknown
-                if (Array.isArray(parsed)) setItems(parsed as CartItem[])
-            }
+            const raw = localStorage.getItem(LS_KEY);
+            if (!raw) return;
+            const parsed = JSON.parse(raw);
+            if (!Array.isArray(parsed)) return;
+
+            const fixed = parsed.map((it: any) => {
+                // уже новый формат — оставляем как есть
+                if (typeof it?.productId === 'number' && Number.isFinite(it.productId)) return it;
+
+                // пробуем вытащить productId из строкового id (берём первое число)
+                const fromId = Number(String(it?.id ?? '').match(/\d+/)?.[0]);
+                return {
+                    ...it,
+                    productId: Number.isFinite(fromId) ? fromId : undefined,
+                };
+            });
+
+            setItems(fixed as CartItem[]);
         } catch {
             // ignore
         }
-    }, [])
+    }, []);
+
 
     // persist to localStorage
     useEffect(() => {

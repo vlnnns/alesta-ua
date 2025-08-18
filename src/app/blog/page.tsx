@@ -9,29 +9,31 @@ export const metadata = {
 }
 
 export default function BlogPage() {
-    const [hero, ...rest] = blogPosts
-
     return (
         <main className="px-4 sm:px-6 py-12 bg-white">
             <div className="max-w-7xl mx-auto">
-                {/* Хлебные крошки */}
+                {/* Хлібні крошки */}
                 <nav className="mb-6 text-sm text-neutral-500 flex gap-2 items-center">
-                    <Link href="/" className="hover:underline">Головна</Link>
+                    <Link href="/" className="hover:underline cursor-pointer">Головна</Link>
                     <span>/</span>
                     <span className="text-neutral-800">Блог</span>
                 </nav>
 
-                <h1 className="text-3xl sm:text-5xl font-semibold tracking-tight mb-8 text-neutral-800">Блог</h1>
+                <h1 className="text-3xl sm:text-5xl font-semibold tracking-tight mb-8 text-neutral-800">
+                    Блог
+                </h1>
 
-                {/* Hero зверху */}
-                <div className="mb-10">
-                    <BlogCard post={hero} variant="hero" />
-                </div>
-
-                {/* Решта постів однакової ширини */}
-                <div className="grid gap-6 grid-cols-[repeat(auto-fill,minmax(280px,1fr))]">
-                    {rest.map((p, i) => (
-                        <BlogCard key={p.id} post={p} variant={i % 2 ? 'dark' : 'light'} />
+                {/* Bento / Masonry: 1 колонка мобільні, 2 колонки з md (≥768px) */}
+                <div className="columns-1 md:columns-2 gap-6 [column-fill:_balance]">
+                    {blogPosts.map((p, i) => (
+                        <div key={p.id} className="mb-6 break-inside-avoid-column [break-inside:avoid]">
+                            <BlogCard
+                                post={p}
+                                variant={i === 0 ? 'hero' : i % 2 ? 'dark' : 'light'}
+                                // за бажанням можна трохи зменшити висоту hero всередині колонок:
+                                // className={i === 0 ? 'h-[520px] min-h-[520px] md:h-[560px] md:min-h-[560px]' : ''}
+                            />
+                        </div>
                     ))}
                 </div>
             </div>

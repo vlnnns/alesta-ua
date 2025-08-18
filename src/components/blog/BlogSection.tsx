@@ -9,8 +9,8 @@ export default function BlogSection() {
 
     return (
         <section className="px-4 sm:px-6 py-10 bg-white">
-            <div className="max-w-7xl mx-auto grid gap-6 lg:grid-cols-3">
-                <div className="lg:col-span-2">
+            <div className="max-w-7xl mx-auto grid gap-6 md:grid-cols-2">
+                <div className="">
                     <BlogCard post={hero} variant="hero" />
                 </div>
 

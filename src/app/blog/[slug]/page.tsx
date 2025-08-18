@@ -22,12 +22,12 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
 
     return (
         <article className="px-4 sm:px-6 py-12 text-neutral-800">
-            <div className="max-w-3xl mx-auto">
+            <div className="max-w-7xl mx-auto">
                 {/* Хлебные крошки */}
                 <nav className="mb-6 text-sm text-neutral-500 flex gap-2 items-center">
-                    <Link href="/" className="hover:underline">Головна</Link>
+                    <Link href="/" className="hover:underline cursor-pointer">Головна</Link>
                     <span>/</span>
-                    <Link href="/blog" className="hover:underline">Блог</Link>
+                    <Link href="/blog" className="hover:underline cursor-pointer">Блог</Link>
                     <span>/</span>
                     <span className="text-neutral-800">{post.title}</span>
                 </nav>
@@ -38,7 +38,7 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
                 <h1 className="mt-4 text-3xl sm:text-5xl font-semibold tracking-tight">{post.title}</h1>
                 <p className="mt-3 text-neutral-600">{new Date(post.publishedAt).toLocaleDateString()}</p>
 
-                <div className="relative mt-8 w-full aspect-[16/9] overflow-hidden rounded-2xl">
+                <div className="relative mt-8 w-full aspect-[16/9] overflow-hidden rounded-2xl h-[250px]">
                     <Image
                         src="/diy1.png"
                         alt="DIY cover"

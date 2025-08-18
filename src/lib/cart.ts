@@ -1,19 +1,18 @@
 export type CartItem = {
-    id: string;            // составной ключ (productId + варианты)
-    productId: number;
+    id: string;          // id строки корзины (уникальный ключ для UI)
+    productId: number;   // <-- добавить: реальный id товара
+    title: string;
     image: string;
-    title: string;         // напр. "Фанера ФК 12 мм"
-    price: number;         // за лист
+    price: number;
     quantity: number;
-
-    // варианты/атрибуты
     type: string;
     thickness: number;
     format: string;
     grade: string;
     manufacturer: string;
     waterproofing: string;
-};
+}
+
 
 export function makeCartItemId(input: {
     productId: number;

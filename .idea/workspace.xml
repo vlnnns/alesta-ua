@@ -5,8 +5,52 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="de175ab0-8428-40e4-8774-4f2fdb6fd17e" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/app/(admin)/admin/orders/OrdersTable.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/app/(admin)/admin/orders/export/route.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/app/(admin)/admin/orders/page.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/app/(admin)/admin/page.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/app/(admin)/admin/products/new/actions.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/app/(admin)/admin/products/new/page.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/app/(public)/admin/login/page.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/app/(public)/admin/login/submit/route.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/app/(public)/admin/logout/route.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/app/about/layout.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/app/about/page.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/app/cart/layout.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/app/checkout/actions.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/app/checkout/layout.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/app/checkout/page.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/app/checkout/success/page.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/app/contacts/layout.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/app/contacts/page.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/SiteShell.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/catalog/TypeFilterPicker.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/lib/auth.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/middleware.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/prisma/dev.db" beforeDir="false" afterPath="$PROJECT_DIR$/prisma/dev.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/prisma/schema.prisma" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/admin/products/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/(admin)/admin/products/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/blog/[slug]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/blog/[slug]/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/blog/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/blog/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/blog/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/blog/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/catalog/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/catalog/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/catalog/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/catalog/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/globals.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/ContactSection.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/ContactSection.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Navbar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Navbar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/RecommendedProducts.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/RecommendedProducts.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/TrustedPartnerSection.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/TrustedPartnerSection.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/admin/AdminProductsClient.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/admin/AdminProductsClient.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/blog/BlogCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/blog/BlogCard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/blog/BlogSection.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/blog/BlogSection.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/cart/CartDrawer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/cart/CartDrawer.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/cart/CartPageClient.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/cart/CartPageClient.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/cart/CartProvider.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/cart/CartProvider.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/product/ProductCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/product/ProductCard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/cart.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/cart.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/prisma.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/prisma.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,43 +76,51 @@
   &quot;associatedIndex&quot;: 0
 }</component>
   <component name="ProjectId" id="30oZqdm8bsjmL7aq0Cr81VqTCoO" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;javascript.nodejs.core.library.configured.version&quot;: &quot;22.17.1&quot;,
-    &quot;javascript.nodejs.core.library.typings.version&quot;: &quot;22.17.0&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/admin/vln/work/alesta/src/app/catalog&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;/Users/admin/vln/work/alesta/node_modules/typescript/lib&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "main",
+    "javascript.nodejs.core.library.configured.version": "22.17.1",
+    "javascript.nodejs.core.library.typings.version": "22.17.0",
+    "last_opened_file_path": "/Users/admin/vln/work/alesta/src/app/checkout",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "ts.external.directory.path": "/Users/admin/vln/work/alesta/node_modules/typescript/lib",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;sqlite&quot;
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "sqlite"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/app/checkout" />
+      <recent name="$PROJECT_DIR$/src/app/cart" />
+      <recent name="$PROJECT_DIR$/src/app/about" />
+      <recent name="$PROJECT_DIR$/src/app/contacts" />
       <recent name="$PROJECT_DIR$/src/app/catalog" />
-      <recent name="$PROJECT_DIR$/src" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/src/components/catalog" />
+      <recent name="$PROJECT_DIR$/src/app/(public)/admin" />
+      <recent name="$PROJECT_DIR$/src/app/(public)/admin/login/submit" />
+      <recent name="$PROJECT_DIR$/src/app/(admin)" />
       <recent name="$PROJECT_DIR$/src" />
-      <recent name="$PROJECT_DIR$/src/components/quiz" />
+      <recent name="$PROJECT_DIR$" />
     </key>
   </component>
   <component name="SharedIndexes">
@@ -89,7 +141,7 @@
       <workItem from="1754296079734" duration="7973000" />
       <workItem from="1754412689739" duration="8343000" />
       <workItem from="1754765189848" duration="11144000" />
-      <workItem from="1755070985098" duration="11056000" />
+      <workItem from="1755070985098" duration="32219000" />
     </task>
     <servers />
   </component>

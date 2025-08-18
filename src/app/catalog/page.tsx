@@ -3,6 +3,8 @@ import { Prisma } from '@prisma/client'
 import type { PlywoodProduct } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import CatalogProductGrid from '@/components/catalog/CatalogProductGrid'
+import TypeFilterPicker from '@/components/catalog/TypeFilterPicker'
+
 
 export const metadata = {
     title: 'Каталог',
@@ -30,12 +32,13 @@ function getTypeParam(raw: unknown): FilterType {
 
 type CatalogSearchParams = { type?: string }
 
+
 export default async function CatalogPage({
                                               searchParams,
                                           }: {
-    searchParams: Promise<CatalogSearchParams> // ← главное изменение
+    searchParams: Promise<CatalogSearchParams>
 }) {
-    const sp = await searchParams                   // ← ждём промис
+    const sp = await searchParams
     const typeParam = getTypeParam(sp?.type)
 
     const where: Prisma.PlywoodProductWhereInput =
@@ -61,20 +64,30 @@ export default async function CatalogPage({
                     Каталог
                 </h1>
 
-                {/* 2 columns: sidebar + content */}
+
                 <div className="flex flex-col sm:flex-row gap-8">
-                    {/* LEFT — types */}
-                    <aside className="w-full sm:w-[260px] sm:shrink-0 sm:sticky sm:top-24 self-start">
-                        <h2 className="text-lg font-semibold mb-4 text-neutral-900">Типи фанери</h2>
+                    {/* LEFT — types (тільки на sm+) */}
+                    <aside
+                        className={[
+                            'hidden sm:block',                  // ← приховано на мобі
+                            'sm:sticky sm:top-24 sm:w-[260px] sm:shrink-0 self-start',
+                        ].join(' ')}
+                    >
+                        <h2 className="text-lg font-semibold mb-4 text-neutral-900">
+                            Типи фанери
+                        </h2>
+
                         <ul className="space-y-2">
                             <li>
                                 <Link
                                     href="/catalog"
                                     scroll={false}
-                                    className={`block rounded-xl px-4 py-2 border transition
-                    ${typeParam === 'all'
-                                        ? 'border-[#D08B4C] bg-[#FFF9F3] text-neutral-900'
-                                        : 'border-neutral-200 hover:border-neutral-300'}`}
+                                    className={[
+                                        'block w-full rounded-xl px-4 py-2 border transition',
+                                        typeParam === 'all'
+                                            ? 'border-[#D08B4C] bg-[#FFF9F3] text-neutral-900'
+                                            : 'border-neutral-200 hover:border-neutral-300',
+                                    ].join(' ')}
                                 >
                                     Усі
                                 </Link>
@@ -87,10 +100,12 @@ export default async function CatalogPage({
                                         <Link
                                             href={href}
                                             scroll={false}
-                                            className={`block rounded-xl px-4 py-2 border transition
-                        ${active
-                                                ? 'border-[#D08B4C] bg-[#FFF9F3] text-neutral-900'
-                                                : 'border-neutral-200 hover:border-neutral-300'}`}
+                                            className={[
+                                                'block w-full rounded-xl px-4 py-2 border transition',
+                                                active
+                                                    ? 'border-[#D08B4C] bg-[#FFF9F3] text-neutral-900'
+                                                    : 'border-neutral-200 hover:border-neutral-300',
+                                            ].join(' ')}
                                         >
                                             {t}
                                         </Link>
@@ -103,12 +118,7 @@ export default async function CatalogPage({
                     {/* RIGHT — products */}
                     <section className="flex-1 min-w-0">
                         <div className="mb-4">
-              <span className="inline-flex items-center gap-2 text-sm px-3 py-1.5 rounded-full bg-black/5 text-neutral-700">
-                Тип:{' '}
-                  <strong className="font-medium text-neutral-900">
-                  {typeParam === 'all' ? 'Усі' : typeParam}
-                </strong>
-              </span>
+                            <TypeFilterPicker types={TYPES} activeType={typeParam} />
                         </div>
 
                         {items.length ? (
@@ -119,6 +129,7 @@ export default async function CatalogPage({
                             </div>
                         )}
                     </section>
+
                 </div>
             </div>
         </main>
