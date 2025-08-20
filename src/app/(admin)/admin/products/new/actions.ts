@@ -1,24 +1,30 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
-import { z } from 'zod'
+import { z, ZodError } from 'zod'
 import { revalidatePath } from 'next/cache'
 
-const schema = z.object({
-    type: z.string().min(1),
-    thickness: z.coerce.number().positive(),
-    format: z.string().min(1),
-    grade: z.string().min(1),
-    manufacturer: z.string().min(1),
-    waterproofing: z.string().min(1),
-    price: z.coerce.number().int().nonnegative(),
-    image: z.string().min(1),
-    inStock: z.coerce.boolean().optional().default(false),
-})
+type CreateResult =
+    | { ok: true; id: number }
+    | { ok: false; error: string }
 
-export async function createProduct(form: FormData) {
+const baseSchema = z.object({
+    type: z.string().min(1, 'Вкажіть тип'),
+    thickness: z.coerce.number().positive('Товщина має бути > 0'),
+    format: z.string().min(1, 'Вкажіть формат'),
+    grade: z.string().min(1, 'Вкажіть сорт'),
+    manufacturer: z.string().min(1, 'Вкажіть виробника'),
+    waterproofing: z.string().min(1, 'Вкажіть клей/вологостійкість'),
+    // вместо deprecated nonnegative() используем min(0)
+    price: z.coerce.number().int().min(0, 'Ціна не може бути від’ємною'),
+    inStock: z.boolean().optional().default(false),
+})
+const imageUrlSchema = z.string().url('Некоректний URL').optional()
+
+export async function createProduct(form: FormData): Promise<CreateResult> {
     try {
-        const data = schema.parse({
+        // 1) парсим базові поля
+        const parsed = baseSchema.parse({
             type: form.get('type'),
             thickness: form.get('thickness'),
             format: form.get('format'),
@@ -26,14 +32,39 @@ export async function createProduct(form: FormData) {
             manufacturer: form.get('manufacturer'),
             waterproofing: form.get('waterproofing'),
             price: form.get('price'),
-            image: form.get('image'),
             inStock: form.get('inStock') === 'on',
         })
 
-        await prisma.plywoodProduct.create({ data })
+        // 2) image: берем URL, файл пока игнорируем (если нужен — загрузка в S3/Cloudinary)
+        const rawUrl = (form.get('imageUrl') as string | null)?.trim() || ''
+        const image = rawUrl ? imageUrlSchema.parse(rawUrl) : undefined
+
+        const created = await prisma.plywoodProduct.create({
+            data: {
+                type: parsed.type,
+                thickness: parsed.thickness,
+                format: parsed.format,
+                grade: parsed.grade,
+                manufacturer: parsed.manufacturer,
+                waterproofing: parsed.waterproofing,
+                price: parsed.price,
+                inStock: parsed.inStock ?? false,
+                image: image ?? '', // плейсхолдер, щоб не падало
+            },
+            select: { id: true },
+        })
+
         revalidatePath('/admin/products')
-        return { ok: true as const }
-    } catch (e: any) {
-        return { ok: false as const, error: e?.message ?? 'Validation error' }
+        return { ok: true, id: created.id }
+    } catch (e: unknown) {
+        // аккуратное сужение типов
+        if (e instanceof ZodError) {
+            const msg = e.issues.map(i => i.message).join('; ')
+            return { ok: false, error: msg }
+        }
+        if (e instanceof Error) {
+            return { ok: false, error: e.message }
+        }
+        return { ok: false, error: 'Validation error' }
     }
 }
