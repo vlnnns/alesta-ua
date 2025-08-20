@@ -137,8 +137,7 @@ export default function CheckoutPage() {
             return
         }
 
-        clearCart()
-        router.push(`/checkout/success?id=${res.id}`)
+        router.replace(`/checkout/success?id=${res.id}`)
     }
 
     const label = 'block text-sm text-neutral-600 mb-1'
@@ -184,17 +183,29 @@ export default function CheckoutPage() {
                                         <input
                                             type="tel"
                                             inputMode="tel"
-                                            pattern="^\+380\d{9}$"
                                             className={input}
                                             value={form.phone}
                                             onChange={(e) => setForm({ ...form, phone: formatUA(e.target.value) })}
                                             onBlur={(e) => setForm(f => ({ ...f, phone: formatUA(e.target.value) }))}
+                                            onPaste={(e) => {
+                                                const text = (e.clipboardData?.getData('text') || '');
+                                                e.preventDefault();
+                                                setForm(f => ({ ...f, phone: formatUA(text) }));
+                                            }}
+                                            onKeyDown={(e) => {
+                                                // Разрешаем цифры, управление и символы +, (, ), -, пробел
+                                                const allowed = ['Backspace','Delete','ArrowLeft','ArrowRight','Home','End','Tab'];
+                                                if (allowed.includes(e.key)) return;
+                                                if (/[0-9+()\-\s]/.test(e.key)) return;
+                                                e.preventDefault();
+                                            }}
                                             placeholder="+380 (__) ___-__-__"
                                             autoComplete="tel"
+                                            maxLength={19} // "+380 (XX) XXX-XX-XX"
                                             required
                                         />
-
                                     </label>
+
 
                                     <label className={label}>
                                         Email *

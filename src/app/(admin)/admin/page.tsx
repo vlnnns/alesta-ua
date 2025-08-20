@@ -67,11 +67,11 @@ export default async function AdminHome() {
                                 Всього позицій: <span className="font-medium text-neutral-900">{productCount}</span>
                             </div>
                             <div className="flex items-center gap-2">
-                                <Link href="/src/app/(admin)/admin/products"
+                                <Link href="/admin/products"
                                       className="rounded-xl bg-[#D08B4C] px-4 py-2 text-white hover:bg-[#c57b37]">
                                     Перейти до товарів
                                 </Link>
-                                <Link href="/src/app/(admin)/admin/products/new"
+                                <Link href="/admin/products/new"
                                       className="rounded-xl border border-neutral-200 px-4 py-2 hover:bg-neutral-50">
                                     + Додати товар
                                 </Link>
@@ -97,15 +97,15 @@ export default async function AdminHome() {
                                 Всього замовлень: <span className="font-medium text-neutral-900">{orderCount}</span>
                             </div>
                             <div className="flex items-center gap-2">
-                                <Link href="/src/app/(admin)/admin/orders"
+                                <Link href="/admin/orders"
                                       className="rounded-xl bg-[#D08B4C] px-4 py-2 text-white hover:bg-[#c57b37]">
                                     Перейти до замовлень
                                 </Link>
-                                <Link href="/src/app/(admin)/admin/orders/export?range=30d"
+                                <Link href="/admin/orders/export?range=30d"
                                       className="rounded-xl border border-neutral-200 px-4 py-2 hover:bg-neutral-50">
                                     Експорт CSV (30 днів)
                                 </Link>
-                                <Link href="/src/app/(admin)/admin/orders/export?range=7d"
+                                <Link href="/admin/orders/export?range=7d"
                                       className="rounded-xl border border-neutral-200 px-4 py-2 hover:bg-neutral-50">
                                     Експорт CSV (7 днів)
                                 </Link>
@@ -134,7 +134,7 @@ export default async function AdminHome() {
                 <section className="rounded-2xl border border-neutral-200 bg-white">
                     <div className="flex items-center justify-between px-5 py-4 border-b border-neutral-200">
                         <h3 className="text-lg font-semibold">Останні замовлення</h3>
-                        <Link href="/src/app/(admin)/admin/orders" className="text-[#D08B4C] text-sm hover:underline">Всі замовлення →</Link>
+                        <Link href="/admin/orders" className="text-[#D08B4C] text-sm hover:underline">Всі замовлення →</Link>
                     </div>
 
                     <div className="overflow-x-auto">
