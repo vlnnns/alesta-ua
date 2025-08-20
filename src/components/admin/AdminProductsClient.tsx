@@ -20,11 +20,21 @@ type Product = {
     updatedAt?: string
 }
 
+const FALLBACK_IMAGE =
+    // 1×1 прозорий PNG, щоб не тягнути файл з /public
+    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO9m3WQAAAAASUVORK5CYII='
+
 export default function AdminProductsClient() {
     const [items, setItems] = useState<Product[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
 
+    // state модалки редагування
+    const [editing, setEditing] = useState<Product | null>(null)
+    const [saving, setSaving] = useState(false)
+    const [formErr, setFormErr] = useState<string | null>(null)
+
+    // initial load
     useEffect(() => {
         const ac = new AbortController()
         ;(async () => {
@@ -44,8 +54,7 @@ export default function AdminProductsClient() {
         return () => ac.abort()
     }, [])
 
-    const FALLBACK_IMAGE = '/no-image.png'
-
+    // для підказок (якщо захочеш додати datalist у модалку)
     const meta = useMemo(() => {
         const uniq = <T,>(arr: T[]) => [...new Set(arr.filter(Boolean) as T[])]
         return {
@@ -58,6 +67,7 @@ export default function AdminProductsClient() {
         }
     }, [items])
 
+    // групування за типом
     const groups = useMemo(() => {
         const map = new Map<string, Product[]>()
         for (const p of items) {
@@ -101,6 +111,66 @@ export default function AdminProductsClient() {
         }
     }
 
+    // Сабміт модалки редагування
+    const submitEdit: React.FormEventHandler<HTMLFormElement> = async (e) => {
+        e.preventDefault()
+        if (!editing) return
+        setFormErr(null)
+        setSaving(true)
+
+        const fd = new FormData(e.currentTarget)
+        const payload = {
+            type: (fd.get('type') as string).trim(),
+            thickness: Number(fd.get('thickness') || 0),
+            format: (fd.get('format') as string).trim(),
+            grade: (fd.get('grade') as string).trim(),
+            manufacturer: (fd.get('manufacturer') as string).trim(),
+            waterproofing: (fd.get('waterproofing') as string).trim(),
+            price: Number(fd.get('price') || 0),
+            inStock: fd.get('inStock') === 'on',
+            // image тут не редагуємо; якщо треба — окрема логіка з аплоадом
+        }
+
+        // проста фронт‑валідація
+        if (!payload.type || !payload.format || !payload.grade || !payload.manufacturer || !payload.waterproofing) {
+            setFormErr('Заповніть обовʼязкові поля')
+            setSaving(false)
+            return
+        }
+        if (payload.thickness <= 0) {
+            setFormErr('Товщина має бути > 0')
+            setSaving(false)
+            return
+        }
+        if (!Number.isFinite(payload.price) || payload.price < 0) {
+            setFormErr('Ціна не може бути відʼємною')
+            setSaving(false)
+            return
+        }
+
+        try {
+            const res = await fetch(`/api/admin/products/${editing.id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            })
+            if (!res.ok) {
+                const t = await res.text().catch(() => '')
+                throw new Error(t || `HTTP ${res.status}`)
+            }
+            // оновлюємо локально
+            setItems(prev =>
+                prev.map(x => (x.id === editing.id ? { ...x, ...payload } as Product : x))
+            )
+            setEditing(null)
+        } catch (err) {
+            console.error(err)
+            setFormErr('Не вдалося зберегти зміни')
+        } finally {
+            setSaving(false)
+        }
+    }
+
     return (
         <main className="px-4 sm:px-6 py-10 bg-neutral-50 text-neutral-900">
             <div className="max-w-7xl mx-auto">
@@ -115,7 +185,7 @@ export default function AdminProductsClient() {
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
                     <h1 className="text-2xl sm:text-3xl font-semibold">Адмінка — Товари</h1>
 
-                    {/* ссылка на /admin/products/new */}
+                    {/* створення — окрема сторінка */}
                     <Link
                         href="/admin/products/new"
                         className="inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 bg-[#D08B4C] text-white hover:bg-[#c57b37] shadow-sm"
@@ -188,13 +258,12 @@ export default function AdminProductsClient() {
                                             <div className="px-3 pb-3 flex items-center justify-between">
                                                 <div className="text-lg font-semibold">₴{p.price.toLocaleString('uk-UA')}</div>
                                                 <div className="space-x-2">
-                                                    <Link
-                                                        href={`/admin/products/${p.id}`} // если редактируешь через модалку — оставь кнопку/хэндлер
+                                                    <button
+                                                        onClick={() => setEditing(p)}
                                                         className="px-3 py-1 rounded-lg border border-neutral-200 hover:bg-neutral-50 text-sm"
-                                                        onClick={(e) => e.preventDefault()} // убрать, если есть отдельная страница редактирования
                                                     >
                                                         Редагувати
-                                                    </Link>
+                                                    </button>
                                                     <button
                                                         onClick={() => remove(p)}
                                                         className="px-3 py-1 rounded-lg border border-red-300 text-red-600 hover:bg-red-50 text-sm"
@@ -217,6 +286,85 @@ export default function AdminProductsClient() {
                     </div>
                 )}
             </div>
+
+            {/* МОДАЛКА РЕДАГУВАННЯ */}
+            {editing && (
+                <div className="fixed inset-0 z-50">
+                    <div className="absolute inset-0 bg-black/40" onClick={() => setEditing(null)} />
+                    <div className="absolute right-0 top-0 h-full w-[560px] max-w-[100vw] bg-white shadow-2xl p-6 overflow-y-auto">
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-lg font-semibold">Редагувати товар #{editing.id}</h2>
+                            <button onClick={() => setEditing(null)} className="p-2 hover:bg-black/5 rounded-lg" aria-label="Закрити">✕</button>
+                        </div>
+
+                        <form onSubmit={submitEdit} className="grid grid-cols-2 gap-4">
+                            <Field label="Тип" name="type" defaultValue={editing.type} />
+                            <Field label="Товщина (мм)" name="thickness" type="number" defaultValue={String(editing.thickness)} />
+                            <Field label="Формат" name="format" defaultValue={editing.format} />
+                            <Field label="Сорт" name="grade" defaultValue={editing.grade} />
+                            <Field label="Виробник" name="manufacturer" defaultValue={editing.manufacturer} />
+                            <Field label="Клей/вологостійкість" name="waterproofing" defaultValue={editing.waterproofing} />
+                            <Field label="Ціна (₴)" name="price" type="number" defaultValue={String(editing.price)} />
+
+                            <div className="col-span-2 mt-2">
+                                <label className="inline-flex items-center gap-2 text-sm">
+                                    <input name="inStock" type="checkbox" defaultChecked={editing.inStock} className="h-4 w-4" />
+                                    В наявності
+                                </label>
+                            </div>
+
+                            {formErr && (
+                                <div className="col-span-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                                    {formErr}
+                                </div>
+                            )}
+
+                            <div className="col-span-2 mt-2 flex gap-2">
+                                <button
+                                    type="submit"
+                                    disabled={saving}
+                                    className="rounded-xl px-5 py-2.5 bg-[#D08B4C] hover:bg-[#c57b37] text-white disabled:opacity-60 shadow-sm"
+                                >
+                                    {saving ? 'Збереження…' : 'Зберегти'}
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setEditing(null)}
+                                    className="rounded-xl px-5 py-2.5 border border-neutral-200 hover:bg-neutral-50"
+                                >
+                                    Скасувати
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </main>
+    )
+}
+
+/* ---------- дрібні допоміжні ---------- */
+
+function Field({
+                   label,
+                   name,
+                   defaultValue,
+                   type = 'text',
+               }: {
+    label: string
+    name: string
+    defaultValue?: string
+    type?: 'text' | 'number'
+}) {
+    return (
+        <label className="text-sm">
+            <span className="block text-neutral-600 mb-1">{label}</span>
+            <input
+                name={name}
+                type={type}
+                defaultValue={defaultValue}
+                className="w-full rounded-xl border border-neutral-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#D08B4C]/30 focus:border-[#D08B4C]"
+            />
+        </label>
     )
 }
