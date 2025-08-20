@@ -1,4 +1,3 @@
-// app/api/recommend/route.ts
 import { NextResponse, NextRequest } from 'next/server'
 import { PrismaClient, Prisma } from '@prisma/client'
 
@@ -13,19 +12,12 @@ type RecommendBody = Partial<{
 }>
 
 // ---------- GET: "просто поради" без фільтрів ----------
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
     try {
-        const sp = req.nextUrl.searchParams
-        const limitRaw = sp.get('limit')
-        const safeLimit =
-            limitRaw && !Number.isNaN(Number(limitRaw))
-                ? Math.min(Math.max(Number(limitRaw), 1), 48)
-                : 8
-
-        // тут своя логіка рекомендацій: найдешевші / нові / довільні
+        // рівно 3 товари, найдешевші (потім за id)
         const products = await prisma.plywoodProduct.findMany({
             orderBy: [{ price: 'asc' }, { id: 'asc' }],
-            take: safeLimit,
+            take: 3,
         })
 
         return NextResponse.json(products, { status: 200 })
@@ -65,10 +57,11 @@ export async function POST(req: NextRequest) {
             ...(parsedThickness !== undefined ? { thickness: parsedThickness } : {}),
         }
 
+        // рівно 3 товари за фільтром
         const products = await prisma.plywoodProduct.findMany({
             where,
             orderBy: [{ price: 'asc' }, { id: 'asc' }],
-            take: 48,
+            take: 3,
         })
 
         return NextResponse.json(products, { status: 200 })
