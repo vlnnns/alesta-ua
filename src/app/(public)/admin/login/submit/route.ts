@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { signToken } from '@/lib/auth'
 
 export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
 export async function POST(req: Request) {
     const form = await req.formData()
@@ -10,7 +11,7 @@ export async function POST(req: Request) {
     const password = String(form.get('password') ?? '')
     const nextRaw = form.get('next')
 
-    // allow only internal paths (no //, no /admin/login)
+    // дозволяємо переходити лише на внутрішні посилання
     let nextPath = '/admin'
     if (
         typeof nextRaw === 'string' &&
@@ -30,32 +31,37 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Admin credentials not configured' }, { status: 500 })
     }
 
-    // small delay against brute force (optional)
+    // маленька пауза проти brute-force
     await new Promise(r => setTimeout(r, 150))
 
-    // build origin from request headers (works behind nginx too)
-    const hdrs = new Headers(req.headers)
-    const host = hdrs.get('host') ?? new URL(req.url).host
-    const proto = (hdrs.get('x-forwarded-proto') ?? new URL(req.url).protocol.replace(':',''))
-    const origin = `${proto}://${host}`
-
     if (username !== okUser || password !== okPass) {
-        const url = new URL('/admin/login', origin)
-        url.searchParams.set('err', 'creds')
-        url.searchParams.set('next', nextPath)
-        return NextResponse.redirect(url, { status: 303 })
+        // ВАЖЛИВО: відносний redirect, щоб не летіти на localhost за проксі
+        const res = new NextResponse(null, {
+            status: 303,
+            headers: { Location: `/admin/login?err=creds&next=${encodeURIComponent(nextPath)}` },
+        })
+        // no-cache
+        res.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, private')
+        return res
     }
 
     const exp = Math.floor(Date.now() / 1000) + 60 * 60 * 8
     const token = await signToken('admin', exp, process.env.AUTH_SECRET || 'dev-secret')
 
-    const res = NextResponse.redirect(new URL(nextPath, origin), { status: 303 })
+    const res = new NextResponse(null, {
+        status: 303,
+        headers: { Location: nextPath }, // відносний redirect
+    })
+
     res.cookies.set('admin_session', token, {
         httpOnly: true,
-        secure: proto === 'https',
-        sameSite: 'strict',
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',               // 'lax' надійніше для redirect‑сценаріїв
         path: '/',
         maxAge: 60 * 60 * 8,
     })
+
+    // no-cache
+    res.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, private')
     return res
 }
