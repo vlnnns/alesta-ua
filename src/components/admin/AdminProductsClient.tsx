@@ -125,30 +125,66 @@ export default function AdminProductsClient() {
     async function save() {
         try {
             setSaving(true)
-            const fd = new FormData()
-            fd.append('type', draft.type.trim())
-            fd.append('thickness', String(Number(draft.thickness || 0)))
-            fd.append('format', draft.format.trim())
-            fd.append('grade', draft.grade.trim())
-            fd.append('manufacturer', draft.manufacturer.trim())
-            fd.append('waterproofing', draft.waterproofing.trim())
-            fd.append('price', String(Number(draft.price || 0)))
-            fd.append('inStock', draft.inStock ? 'on' : '')
-            if (imageFile) fd.append('imageFile', imageFile)
-            else if (draft.image) fd.append('imageUrl', draft.image)
 
             const url = editing ? `/api/admin/products/${editing.id}` : '/api/admin/products'
-            const res = await fetch(url, { method: editing ? 'PATCH' : 'POST', body: fd })
-            if (!res.ok) throw new Error(`HTTP ${res.status}`)
+            let res: Response
+
+            if (!editing) {
+                // создание — пусть остаётся FormData (как было)
+                const fd = new FormData()
+                // ... ваш код append(...)
+                res = await fetch(url, { method: 'POST', body: fd })
+            } else {
+                if (imageFile) {
+                    // при наличии файла — FormData
+                    const fd = new FormData()
+                    fd.append('type', draft.type.trim())
+                    fd.append('thickness', String(Number(draft.thickness || 0)))
+                    fd.append('format', draft.format.trim())
+                    fd.append('grade', draft.grade.trim())
+                    fd.append('manufacturer', draft.manufacturer.trim())
+                    fd.append('waterproofing', draft.waterproofing.trim())
+                    fd.append('price', String(Number(draft.price || 0)))
+                    fd.append('inStock', draft.inStock ? 'on' : '')
+                    fd.append('imageFile', imageFile)
+                    res = await fetch(url, { method: 'PATCH', body: fd })
+                } else {
+                    // без файла — JSON
+                    const body = {
+                        type: draft.type.trim(),
+                        thickness: Number(draft.thickness || 0),
+                        format: draft.format.trim(),
+                        grade: draft.grade.trim(),
+                        manufacturer: draft.manufacturer.trim(),
+                        waterproofing: draft.waterproofing.trim(),
+                        price: Number(draft.price || 0),
+                        inStock: !!draft.inStock,
+                        image: draft.image?.trim() || undefined, // если редактируете URL
+                    }
+                    res = await fetch(url, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(body),
+                    })
+                }
+            }
+
+            if (!res.ok) {
+                const msg = await res.text().catch(() => '')
+                throw new Error(msg || `HTTP ${res.status}`)
+            }
+
             const saved = (await res.json()) as Product
             setItems(prev => (editing ? prev.map(x => (x.id === saved.id ? saved : x)) : [saved, ...prev]))
             closeForm()
-        } catch {
+        } catch (e) {
+            console.error(e)
             alert('Помилка збереження')
         } finally {
             setSaving(false)
         }
     }
+
 
     const toggleStock = async (p: Product) => {
         const next = !p.inStock
