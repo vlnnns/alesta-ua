@@ -3,6 +3,7 @@
 
 import { Fragment, useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
+import Breadcrumbs from '@/components/common/Breadcrumbs'
 
 type Product = {
     id: number
@@ -218,6 +219,14 @@ export default function AdminProductsClient() {
     return (
         <main className="px-4 sm:px-6 py-10 bg-neutral-50 text-neutral-900">
             <div className="max-w-7xl mx-auto">
+                <Breadcrumbs
+                    items={[
+                        { label: 'Головна', href: '/' },
+                        { label: 'Адмінка', href: '/admin' },
+                        { label: 'Товари' },
+                    ]}
+                />
+
                 {/* header */}
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
                     <h1 className="text-2xl sm:text-3xl font-semibold">Адмінка — Товари</h1>
@@ -247,7 +256,7 @@ export default function AdminProductsClient() {
                                 </div>
 
                                 {/* grid карток */}
-                                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                                <div className="flex flex-row flex-wrap gap-4">
                                     {list.map(p => (
                                         <article
                                             key={p.id}

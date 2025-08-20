@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import OrdersTable from './OrdersTable'
+import Breadcrumbs from '@/components/common/Breadcrumbs'
 
 export const revalidate = 0
 
@@ -20,6 +21,14 @@ export default async function AdminOrdersPage() {
     return (
         <main className="px-4 sm:px-6 py-10 bg-neutral-50 text-neutral-900">
             <div className="mx-auto max-w-6xl">
+                <Breadcrumbs
+                    items={[
+                        { label: 'Головна', href: '/' },
+                        { label: 'Адмінка', href: '/admin' },
+                        { label: 'Замовлення' },
+                    ]}
+                />
+
                 <h1 className="mb-6 text-3xl font-semibold">Замовлення</h1>
                 <OrdersTable orders={safeOrders} />
             </div>
