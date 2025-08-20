@@ -1,4 +1,5 @@
 export const revalidate = 0;
+import Breadcrumbs from '@/components/common/Breadcrumbs'
 
 export default async function AdminLoginPage({
                                                  searchParams,
@@ -13,6 +14,12 @@ export default async function AdminLoginPage({
     return (
         <main className="min-h-screen grid place-items-center bg-neutral-50 px-4 text-neutral-700">
             <div className="w-full max-w-md rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+                <Breadcrumbs
+                    items={[
+                        { label: 'Головна', href: '/' },
+                        { label: 'Вхід' },
+                    ]}
+                />
                 <h1 className="text-2xl font-semibold">Вхід в адмінку</h1>
                 <p className="mt-1 text-sm text-neutral-600">Укажіть облікові дані.</p>
 

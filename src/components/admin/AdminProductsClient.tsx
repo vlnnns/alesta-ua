@@ -191,8 +191,12 @@ export default function AdminProductsClient() {
                                 </div>
 
                                 <div className="flex flex-row flex-wrap gap-4">
-                                    {list.map(p => (
-                                        <article key={p.id} className="group rounded-2xl border border-neutral-200 bg-white hover:shadow-sm transition overflow-hidden">
+                                    {list.map((p) => (
+                                        <article
+                                            key={p.id}
+                                            className="group flex flex-col justify-between w-96 h-44 rounded-2xl border border-neutral-200 bg-white hover:shadow-sm transition overflow-hidden"
+                                        >
+                                            {/* верхня частина */}
                                             <div className="p-3 flex items-start gap-3">
                                                 <div className="relative h-20 w-20 shrink-0 rounded-lg overflow-hidden border border-neutral-200 bg-neutral-100">
                                                     <Image
@@ -214,14 +218,14 @@ export default function AdminProductsClient() {
 
                                                         <button
                                                             onClick={() => toggleStock(p)}
-                                                            className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ring-1 transition
-                                ${p.inStock
-                                                                ? 'bg-emerald-50 text-emerald-700 ring-emerald-100 border border-emerald-200'
-                                                                : 'bg-rose-50 text-rose-700 ring-rose-100 border border-rose-200'
+                                                            className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[8px] font-medium ring-1 transition
+                ${
+                                                                p.inStock
+                                                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                                                    : 'bg-rose-50 text-rose-700  border border-rose-200'
                                                             }`}
                                                             title={p.inStock ? 'Зробити “немає”' : 'Зробити “в наявності”'}
                                                         >
-                                                            <span className={`h-1.5 w-1.5 rounded-full ${p.inStock ? 'bg-emerald-500' : 'bg-rose-500'}`} />
                                                             {p.inStock ? 'В наявності' : 'Немає'}
                                                         </button>
                                                     </div>
@@ -233,8 +237,11 @@ export default function AdminProductsClient() {
                                                 </div>
                                             </div>
 
-                                            <div className="px-3 pb-3 flex items-center justify-between">
-                                                <div className="text-lg font-semibold">₴{p.price.toLocaleString('uk-UA')}</div>
+                                            {/* нижня частина завжди прижата вниз */}
+                                            <div className="px-3 pb-3 flex items-center justify-between mt-auto">
+                                                <div className="text-lg font-semibold">
+                                                    ₴{p.price.toLocaleString('uk-UA')}
+                                                </div>
                                                 <div className="space-x-2">
                                                     <button
                                                         onClick={() => setEditing(p)}
@@ -253,6 +260,7 @@ export default function AdminProductsClient() {
                                         </article>
                                     ))}
                                 </div>
+
                             </section>
                         ))}
 
