@@ -10,6 +10,9 @@ export default function NewProductPage() {
     const [error, setError] = useState<string | null>(null)
     const [preview, setPreview] = useState<string | null>(null)
 
+    const label = 'block text-sm text-neutral-600 mb-1'
+    const input = 'w-full rounded-xl border border-neutral-200 bg-white px-3 py-2 outline-none focus:ring-2 focus:ring-[#D08B4C]/30 focus:border-[#D08B4C]'
+
     async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
         setError(null); setLoading(true)
@@ -20,13 +23,20 @@ export default function NewProductPage() {
         router.push('/admin/products')
     }
 
-    const label = 'block text-sm text-neutral-600 mb-1'
-    const input = 'w-full rounded-xl border border-neutral-200 bg-white px-3 py-2 outline-none focus:ring-2 focus:ring-[#D08B4C]/30 focus:border-[#D08B4C]'
-
     return (
         <main className="px-4 sm:px-6 py-10 bg-neutral-50 text-neutral-900">
             <div className="mx-auto max-w-3xl">
-                <h1 className="mb-6 text-2xl font-semibold">Додати товар</h1>
+                <div className="flex items-center justify-between mb-6">
+                    <h1 className="text-2xl font-semibold">Додати товар</h1>
+                    {/* крестик закрыть */}
+                    <button
+                        type="button"
+                        onClick={() => router.push('/admin/products')}
+                        className="text-neutral-400 hover:text-neutral-600 text-xl"
+                    >
+                        ✖
+                    </button>
+                </div>
 
                 <form onSubmit={onSubmit} encType="multipart/form-data" className="rounded-2xl border border-neutral-200 bg-white p-5 space-y-4">
                     <div className="grid gap-4 sm:grid-cols-2">
@@ -39,15 +49,16 @@ export default function NewProductPage() {
                         <label className={label}>Ціна (₴) *<input name="price" type="number" min="0" className={input} required /></label>
                     </div>
 
-                    {/* Upload / або URL */}
-                    <div className="grid gap-4 sm:grid-cols-2">
+                    {/* только файл */}
+                    <div>
                         <label className={label}>
-                            Зображення (файл з ПК)
+                            Зображення (файл з ПК) *
                             <input
                                 name="imageFile"
                                 type="file"
                                 accept="image/*"
                                 className={input}
+                                required
                                 onChange={(e) => {
                                     const f = e.currentTarget.files?.[0]
                                     setPreview(f ? URL.createObjectURL(f) : null)
@@ -59,12 +70,6 @@ export default function NewProductPage() {
                                     <img src={preview} alt="preview" className="h-28 w-28 rounded-lg border border-neutral-200 object-cover" />
                                 </div>
                             )}
-                        </label>
-
-                        <label className={label}>
-                            або посилання на зображення (URL)
-                            <input name="imageUrl" placeholder="https://..." className={input} />
-                            <span className="mt-1 block text-xs text-neutral-500">Якщо файл вибрано — URL ігнорується</span>
                         </label>
                     </div>
 
@@ -79,6 +84,15 @@ export default function NewProductPage() {
                         <button type="submit" disabled={loading}
                                 className="rounded-xl bg-[#D08B4C] px-5 py-3 text-white hover:bg-[#c57b37] disabled:opacity-60">
                             {loading ? 'Зберігаємо…' : 'Створити товар'}
+                        </button>
+
+                        {/* кнопка отмены */}
+                        <button
+                            type="button"
+                            onClick={() => router.push('/admin/products')}
+                            className="rounded-xl border border-neutral-300 px-5 py-3 text-neutral-700 hover:bg-neutral-100"
+                        >
+                            Скасувати
                         </button>
                     </div>
                 </form>

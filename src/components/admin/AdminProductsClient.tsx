@@ -1,8 +1,8 @@
-// src/components/admin/AdminProductsClient.tsx
 'use client'
 
-import { Fragment, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import Breadcrumbs from '@/components/common/Breadcrumbs'
 
 type Product = {
@@ -14,24 +14,10 @@ type Product = {
     manufacturer: string
     waterproofing: string
     price: number
-    image: string
+    image: string | null
     inStock: boolean
     createdAt?: string
     updatedAt?: string
-}
-
-type Draft = Omit<Product, 'id' | 'createdAt' | 'updatedAt'>
-
-const emptyDraft: Draft = {
-    type: '',
-    thickness: 0,
-    format: '',
-    grade: '',
-    manufacturer: '',
-    waterproofing: '',
-    price: 0,
-    image: '',
-    inStock: true,
 }
 
 export default function AdminProductsClient() {
@@ -39,16 +25,6 @@ export default function AdminProductsClient() {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
 
-    const [showForm, setShowForm] = useState(false)
-    const [editing, setEditing] = useState<Product | null>(null)
-    const [draft, setDraft] = useState<Draft>(emptyDraft)
-    const [saving, setSaving] = useState(false)
-
-    // upload state
-    const [imageFile, setImageFile] = useState<File | null>(null)
-    const [imagePreview, setImagePreview] = useState<string | null>(null)
-
-    // initial load
     useEffect(() => {
         const ac = new AbortController()
         ;(async () => {
@@ -68,7 +44,8 @@ export default function AdminProductsClient() {
         return () => ac.abort()
     }, [])
 
-    // suggestions
+    const FALLBACK_IMAGE = '/no-image.png'
+
     const meta = useMemo(() => {
         const uniq = <T,>(arr: T[]) => [...new Set(arr.filter(Boolean) as T[])]
         return {
@@ -81,7 +58,6 @@ export default function AdminProductsClient() {
         }
     }, [items])
 
-    // групування за типом
     const groups = useMemo(() => {
         const map = new Map<string, Product[]>()
         for (const p of items) {
@@ -89,103 +65,12 @@ export default function AdminProductsClient() {
             if (!map.has(key)) map.set(key, [])
             map.get(key)!.push(p)
         }
-        // сортуємо в групі за товщиною, потім за форматом
         for (const [k, arr] of map) {
             arr.sort((a, b) => (a.thickness - b.thickness) || a.format.localeCompare(b.format))
             map.set(k, arr)
         }
         return Array.from(map.entries()).sort((a, b) => a[0].localeCompare(b[0], 'uk'))
     }, [items])
-
-    const openCreate = () => {
-        setEditing(null)
-        setDraft(emptyDraft)
-        setShowForm(true)
-        setImageFile(null)
-        if (imagePreview?.startsWith('blob:')) URL.revokeObjectURL(imagePreview)
-        setImagePreview(null)
-    }
-    const openEdit = (p: Product) => {
-        const { id, createdAt, updatedAt, ...rest } = p
-        setEditing(p)
-        setDraft(rest)
-        setShowForm(true)
-        setImageFile(null)
-        if (imagePreview?.startsWith('blob:')) URL.revokeObjectURL(imagePreview)
-        setImagePreview(p.image || null)
-    }
-    const closeForm = () => {
-        setShowForm(false)
-        setEditing(null)
-        setDraft(emptyDraft)
-        setImageFile(null)
-        if (imagePreview?.startsWith('blob:')) URL.revokeObjectURL(imagePreview)
-        setImagePreview(null)
-    }
-
-    async function save() {
-        try {
-            setSaving(true)
-
-            const url = editing ? `/api/admin/products/${editing.id}` : '/api/admin/products'
-            let res: Response
-
-            if (!editing) {
-                // создание — пусть остаётся FormData (как было)
-                const fd = new FormData()
-                // ... ваш код append(...)
-                res = await fetch(url, { method: 'POST', body: fd })
-            } else {
-                if (imageFile) {
-                    // при наличии файла — FormData
-                    const fd = new FormData()
-                    fd.append('type', draft.type.trim())
-                    fd.append('thickness', String(Number(draft.thickness || 0)))
-                    fd.append('format', draft.format.trim())
-                    fd.append('grade', draft.grade.trim())
-                    fd.append('manufacturer', draft.manufacturer.trim())
-                    fd.append('waterproofing', draft.waterproofing.trim())
-                    fd.append('price', String(Number(draft.price || 0)))
-                    fd.append('inStock', draft.inStock ? 'on' : '')
-                    fd.append('imageFile', imageFile)
-                    res = await fetch(url, { method: 'PATCH', body: fd })
-                } else {
-                    // без файла — JSON
-                    const body = {
-                        type: draft.type.trim(),
-                        thickness: Number(draft.thickness || 0),
-                        format: draft.format.trim(),
-                        grade: draft.grade.trim(),
-                        manufacturer: draft.manufacturer.trim(),
-                        waterproofing: draft.waterproofing.trim(),
-                        price: Number(draft.price || 0),
-                        inStock: !!draft.inStock,
-                        image: draft.image?.trim() || undefined, // если редактируете URL
-                    }
-                    res = await fetch(url, {
-                        method: 'PATCH',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(body),
-                    })
-                }
-            }
-
-            if (!res.ok) {
-                const msg = await res.text().catch(() => '')
-                throw new Error(msg || `HTTP ${res.status}`)
-            }
-
-            const saved = (await res.json()) as Product
-            setItems(prev => (editing ? prev.map(x => (x.id === saved.id ? saved : x)) : [saved, ...prev]))
-            closeForm()
-        } catch (e) {
-            console.error(e)
-            alert('Помилка збереження')
-        } finally {
-            setSaving(false)
-        }
-    }
-
 
     const toggleStock = async (p: Product) => {
         const next = !p.inStock
@@ -227,16 +112,19 @@ export default function AdminProductsClient() {
                     ]}
                 />
 
-                {/* header */}
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
                     <h1 className="text-2xl sm:text-3xl font-semibold">Адмінка — Товари</h1>
-                    <button
-                        onClick={openCreate}
+
+                    {/* ссылка на /admin/products/new */}
+                    <Link
+                        href="/admin/products/new"
                         className="inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 bg-[#D08B4C] text-white hover:bg-[#c57b37] shadow-sm"
                     >
-                        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                        </svg>
                         Додати товар
-                    </button>
+                    </Link>
                 </div>
 
                 {loading ? (
@@ -247,7 +135,6 @@ export default function AdminProductsClient() {
                     <div className="space-y-8">
                         {groups.map(([type, list]) => (
                             <section key={type}>
-                                {/* секційний заголовок */}
                                 <div className="mb-3 flex items-end justify-between">
                                     <div>
                                         <h2 className="text-xl font-semibold">Фанера {type}</h2>
@@ -255,16 +142,17 @@ export default function AdminProductsClient() {
                                     </div>
                                 </div>
 
-                                {/* grid карток */}
                                 <div className="flex flex-row flex-wrap gap-4">
                                     {list.map(p => (
-                                        <article
-                                            key={p.id}
-                                            className="group rounded-2xl border border-neutral-200 bg-white hover:shadow-sm transition overflow-hidden"
-                                        >
+                                        <article key={p.id} className="group rounded-2xl border border-neutral-200 bg-white hover:shadow-sm transition overflow-hidden">
                                             <div className="p-3 flex items-start gap-3">
                                                 <div className="relative h-20 w-20 shrink-0 rounded-lg overflow-hidden border border-neutral-200 bg-neutral-100">
-                                                    <Image src={p.image} alt={p.type} fill className="object-contain" />
+                                                    <Image
+                                                        src={p.image && p.image.trim() ? p.image : FALLBACK_IMAGE}
+                                                        alt={p.type}
+                                                        fill
+                                                        className="object-contain"
+                                                    />
                                                 </div>
 
                                                 <div className="min-w-0 flex-1">
@@ -276,7 +164,6 @@ export default function AdminProductsClient() {
                                                             <div className="text-xs text-neutral-500 truncate">#{p.id}</div>
                                                         </div>
 
-                                                        {/* помітна кнопка наявності */}
                                                         <button
                                                             onClick={() => toggleStock(p)}
                                                             className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ring-1 transition
@@ -301,12 +188,13 @@ export default function AdminProductsClient() {
                                             <div className="px-3 pb-3 flex items-center justify-between">
                                                 <div className="text-lg font-semibold">₴{p.price.toLocaleString('uk-UA')}</div>
                                                 <div className="space-x-2">
-                                                    <button
-                                                        onClick={() => openEdit(p)}
+                                                    <Link
+                                                        href={`/admin/products/${p.id}`} // если редактируешь через модалку — оставь кнопку/хэндлер
                                                         className="px-3 py-1 rounded-lg border border-neutral-200 hover:bg-neutral-50 text-sm"
+                                                        onClick={(e) => e.preventDefault()} // убрать, если есть отдельная страница редактирования
                                                     >
                                                         Редагувати
-                                                    </button>
+                                                    </Link>
                                                     <button
                                                         onClick={() => remove(p)}
                                                         className="px-3 py-1 rounded-lg border border-red-300 text-red-600 hover:bg-red-50 text-sm"
@@ -328,176 +216,7 @@ export default function AdminProductsClient() {
                         )}
                     </div>
                 )}
-
-                {/* side panel form */}
-                {showForm && (
-                    <div className="fixed inset-0 z-50">
-                        <div className="absolute inset-0 bg-black/40" onClick={closeForm} />
-                        <div className="absolute right-0 top-0 h-full w-[560px] max-w-[100vw] bg-white shadow-2xl p-6 overflow-y-auto">
-                            <div className="flex items-center justify-between mb-4">
-                                <h2 className="text-lg font-semibold">
-                                    {editing ? 'Редагувати товар' : 'Новий товар'}
-                                </h2>
-                                <button onClick={closeForm} className="p-2 hover:bg-black/5 rounded-lg">✕</button>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <Input label="Тип" value={draft.type} onChange={v => setDraft(s => ({ ...s, type: v }))} list="types" />
-                                <Input label="Товщина (мм)" type="number" value={String(draft.thickness)} onChange={v => setDraft(s => ({ ...s, thickness: Number(v) }))} />
-                                <Input label="Формат" value={draft.format} onChange={v => setDraft(s => ({ ...s, format: v }))} list="formats" />
-                                <Input label="Сорт" value={draft.grade} onChange={v => setDraft(s => ({ ...s, grade: v }))} list="grades" />
-                                <Input label="Виробник" value={draft.manufacturer} onChange={v => setDraft(s => ({ ...s, manufacturer: v }))} list="manufacturers" />
-                                <Input label="Клей/вологостійкість" value={draft.waterproofing} onChange={v => setDraft(s => ({ ...s, waterproofing: v }))} list="waterproofings" />
-                                <Input label="Ціна (₴)" type="number" value={String(draft.price)} onChange={v => setDraft(s => ({ ...s, price: Number(v) }))} />
-                                {/* URL fallback */}
-                                <Input label="Зображення (URL)" value={draft.image} onChange={v => setDraft(s => ({ ...s, image: v }))} />
-                            </div>
-
-                            <ImageUploader
-                                preview={imagePreview}
-                                onFile={(file, url) => {
-                                    if (imagePreview?.startsWith('blob:')) URL.revokeObjectURL(imagePreview)
-                                    setImageFile(file)
-                                    setImagePreview(url)
-                                }}
-                                onClear={() => {
-                                    if (imagePreview?.startsWith('blob:')) URL.revokeObjectURL(imagePreview)
-                                    setImageFile(null)
-                                    setImagePreview(null)
-                                }}
-                            />
-
-                            <div className="mt-3">
-                                <label className="inline-flex items-center gap-2 text-sm">
-                                    <input
-                                        type="checkbox"
-                                        checked={draft.inStock}
-                                        onChange={(e) => setDraft(s => ({ ...s, inStock: e.target.checked }))}
-                                    />
-                                    В наявності
-                                </label>
-                            </div>
-
-                            <div className="mt-6 flex gap-2">
-                                <button
-                                    onClick={save}
-                                    disabled={saving}
-                                    className="rounded-xl px-5 py-2.5 bg-[#D08B4C] hover:bg-[#c57b37] text-white disabled:opacity-60 shadow-sm"
-                                >
-                                    {saving ? 'Збереження…' : 'Зберегти'}
-                                </button>
-                                <button className="rounded-xl px-5 py-2.5 border border-neutral-200 hover:bg-neutral-50" onClick={closeForm}>
-                                    Скасувати
-                                </button>
-                            </div>
-
-                            {/* datalists */}
-                            <datalist id="types">{meta.types.map(v => <option key={v} value={v} />)}</datalist>
-                            <datalist id="formats">{meta.formats.map(v => <option key={v} value={v} />)}</datalist>
-                            <datalist id="grades">{meta.grades.map(v => <option key={v} value={v} />)}</datalist>
-                            <datalist id="manufacturers">{meta.manufacturers.map(v => <option key={v} value={v} />)}</datalist>
-                            <datalist id="waterproofings">{meta.waterproofings.map(v => <option key={v} value={v} />)}</datalist>
-                        </div>
-                    </div>
-                )}
             </div>
         </main>
-    )
-}
-
-/* ---------- helpers ---------- */
-
-function Input({
-                   label,
-                   value,
-                   onChange,
-                   type = 'text',
-                   list,
-               }: {
-    label: string
-    value: string
-    onChange: (v: string) => void
-    type?: 'text' | 'number'
-    list?: string
-}) {
-    return (
-        <label className="text-sm">
-            <span className="block text-neutral-600 mb-1">{label}</span>
-            <input
-                type={type}
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-                list={list}
-                className="w-full rounded-xl border border-neutral-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#D08B4C]/30 focus:border-[#D08B4C]"
-            />
-        </label>
-    )
-}
-
-function ImageUploader({
-                           preview,
-                           onFile,
-                           onClear,
-                       }: {
-    preview: string | null
-    onFile: (file: File, objectUrl: string) => void
-    onClear: () => void
-}) {
-    const [dragOver, setDragOver] = useState(false)
-
-    return (
-        <div className="mt-4">
-            <span className="block text-sm text-neutral-600 mb-1">Завантажити зображення з пристрою</span>
-
-            <label
-                className={`relative flex items-center justify-center gap-3 rounded-2xl border-2 border-dashed px-4 py-6 cursor-pointer transition
-          ${dragOver ? 'bg-neutral-50 border-[#D08B4C]/60' : 'border-neutral-200 hover:bg-neutral-50'}`}
-                onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
-                onDragLeave={() => setDragOver(false)}
-                onDrop={(e) => {
-                    e.preventDefault()
-                    setDragOver(false)
-                    const file = e.dataTransfer.files?.[0]
-                    if (!file) return
-                    const url = URL.createObjectURL(file)
-                    onFile(file, url)
-                }}
-            >
-                <input
-                    type="file"
-                    accept="image/*"
-                    className="absolute inset-0 opacity-0 cursor-pointer"
-                    onChange={(e) => {
-                        const f = e.currentTarget.files?.[0]
-                        if (!f) return
-                        const url = URL.createObjectURL(f)
-                        onFile(f, url)
-                    }}
-                />
-                <svg className="h-6 w-6 text-neutral-400" viewBox="0 0 24 24" fill="none">
-                    <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                </svg>
-                <div className="text-sm text-neutral-700">
-                    Перетягніть файл або натисніть, щоб вибрати
-                    <div className="text-xs text-neutral-500">PNG, JPG, WEBP до 10 МБ</div>
-                </div>
-            </label>
-
-            {preview && (
-                <div className="mt-3 flex items-center gap-3">
-                    <div className="relative h-24 w-24 rounded-lg overflow-hidden border border-neutral-200 bg-neutral-100">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={preview} alt="preview" className="h-full w-full object-cover" />
-                    </div>
-                    <button
-                        type="button"
-                        onClick={onClear}
-                        className="rounded-xl px-3 py-2 border border-neutral-200 hover:bg-neutral-50 text-sm"
-                    >
-                        Прибрати файл
-                    </button>
-                </div>
-            )}
-        </div>
     )
 }
