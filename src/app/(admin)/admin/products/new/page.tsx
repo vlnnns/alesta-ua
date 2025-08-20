@@ -28,11 +28,11 @@ export default function NewProductPage() {
             <div className="mx-auto max-w-3xl">
                 <div className="flex items-center justify-between mb-6">
                     <h1 className="text-2xl font-semibold">Додати товар</h1>
-                    {/* крестик закрыть */}
                     <button
                         type="button"
                         onClick={() => router.push('/admin/products')}
                         className="text-neutral-400 hover:text-neutral-600 text-xl"
+                        aria-label="Закрити"
                     >
                         ✖
                     </button>
@@ -49,7 +49,6 @@ export default function NewProductPage() {
                         <label className={label}>Ціна (₴) *<input name="price" type="number" min="0" className={input} required /></label>
                     </div>
 
-                    {/* только файл */}
                     <div>
                         <label className={label}>
                             Зображення (файл з ПК) *
@@ -86,7 +85,6 @@ export default function NewProductPage() {
                             {loading ? 'Зберігаємо…' : 'Створити товар'}
                         </button>
 
-                        {/* кнопка отмены */}
                         <button
                             type="button"
                             onClick={() => router.push('/admin/products')}

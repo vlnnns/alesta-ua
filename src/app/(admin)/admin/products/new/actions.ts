@@ -38,15 +38,17 @@ export async function createProduct(form: FormData): Promise<CreateResult> {
             return { ok: false, error: 'Файл зображення обовʼязковий' }
         }
 
-        // сохраняем файл на диск: /public/uploads/...
-        const uploadsDir = path.join(process.cwd(), 'public', 'uploads')
+        // зберігаємо у /uploads (не в /public)
+        const uploadsDir = path.join(process.cwd(), 'uploads')
         await fs.mkdir(uploadsDir, { recursive: true })
 
         const ext = (file.type.split('/')[1] || 'bin').toLowerCase()
         const name = `${Date.now()}_${crypto.randomBytes(6).toString('hex')}.${ext}`
         const filePath = path.join(uploadsDir, name)
+
         const buffer = Buffer.from(await file.arrayBuffer())
         await fs.writeFile(filePath, buffer, { mode: 0o644 })
+
         const imageUrl = `/uploads/${name}`
 
         const created = await prisma.plywoodProduct.create({

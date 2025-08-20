@@ -21,7 +21,6 @@ type Product = {
 }
 
 const FALLBACK_IMAGE =
-    // 1×1 прозорий PNG, щоб не тягнути файл з /public
     'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO9m3WQAAAAASUVORK5CYII='
 
 export default function AdminProductsClient() {
@@ -29,12 +28,10 @@ export default function AdminProductsClient() {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
 
-    // state модалки редагування
     const [editing, setEditing] = useState<Product | null>(null)
     const [saving, setSaving] = useState(false)
     const [formErr, setFormErr] = useState<string | null>(null)
 
-    // initial load
     useEffect(() => {
         const ac = new AbortController()
         ;(async () => {
@@ -54,7 +51,6 @@ export default function AdminProductsClient() {
         return () => ac.abort()
     }, [])
 
-    // для підказок (якщо захочеш додати datalist у модалку)
     const meta = useMemo(() => {
         const uniq = <T,>(arr: T[]) => [...new Set(arr.filter(Boolean) as T[])]
         return {
@@ -67,7 +63,6 @@ export default function AdminProductsClient() {
         }
     }, [items])
 
-    // групування за типом
     const groups = useMemo(() => {
         const map = new Map<string, Product[]>()
         for (const p of items) {
@@ -111,7 +106,6 @@ export default function AdminProductsClient() {
         }
     }
 
-    // Сабміт модалки редагування
     const submitEdit: React.FormEventHandler<HTMLFormElement> = async (e) => {
         e.preventDefault()
         if (!editing) return
@@ -128,25 +122,13 @@ export default function AdminProductsClient() {
             waterproofing: (fd.get('waterproofing') as string).trim(),
             price: Number(fd.get('price') || 0),
             inStock: fd.get('inStock') === 'on',
-            // image тут не редагуємо; якщо треба — окрема логіка з аплоадом
         }
 
-        // проста фронт‑валідація
         if (!payload.type || !payload.format || !payload.grade || !payload.manufacturer || !payload.waterproofing) {
-            setFormErr('Заповніть обовʼязкові поля')
-            setSaving(false)
-            return
+            setFormErr('Заповніть обовʼязкові поля'); setSaving(false); return
         }
-        if (payload.thickness <= 0) {
-            setFormErr('Товщина має бути > 0')
-            setSaving(false)
-            return
-        }
-        if (!Number.isFinite(payload.price) || payload.price < 0) {
-            setFormErr('Ціна не може бути відʼємною')
-            setSaving(false)
-            return
-        }
+        if (payload.thickness <= 0) { setFormErr('Товщина має бути > 0'); setSaving(false); return }
+        if (!Number.isFinite(payload.price) || payload.price < 0) { setFormErr('Ціна не може бути відʼємною'); setSaving(false); return }
 
         try {
             const res = await fetch(`/api/admin/products/${editing.id}`, {
@@ -158,10 +140,7 @@ export default function AdminProductsClient() {
                 const t = await res.text().catch(() => '')
                 throw new Error(t || `HTTP ${res.status}`)
             }
-            // оновлюємо локально
-            setItems(prev =>
-                prev.map(x => (x.id === editing.id ? { ...x, ...payload } as Product : x))
-            )
+            setItems(prev => prev.map(x => (x.id === editing.id ? { ...x, ...payload } as Product : x)))
             setEditing(null)
         } catch (err) {
             console.error(err)
@@ -185,7 +164,6 @@ export default function AdminProductsClient() {
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
                     <h1 className="text-2xl sm:text-3xl font-semibold">Адмінка — Товари</h1>
 
-                    {/* створення — окрема сторінка */}
                     <Link
                         href="/admin/products/new"
                         className="inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 bg-[#D08B4C] text-white hover:bg-[#c57b37] shadow-sm"
@@ -343,8 +321,7 @@ export default function AdminProductsClient() {
     )
 }
 
-/* ---------- дрібні допоміжні ---------- */
-
+/* ---------- допоміжне поле ---------- */
 function Field({
                    label,
                    name,
