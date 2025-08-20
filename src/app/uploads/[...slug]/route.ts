@@ -16,17 +16,22 @@ function contentType(ext: string) {
     }
 }
 
-export async function GET(_req: Request, { params }: { params: { slug: string[] } }) {
+export async function GET(
+    _req: Request,
+    ctx: { params: Promise<{ slug: string[] }> }   // <-- params як Promise
+) {
     try {
-        // захист від виходу за межі каталогу
+        const { slug } = await ctx.params             // <-- обов’язково await
         const root = path.resolve(path.join(process.cwd(), 'uploads'))
-        const resolved = path.resolve(path.join(root, ...params.slug))
+        const resolved = path.resolve(path.join(root, ...slug))
+
+        // захист від виходу за межі каталогу
         if (!resolved.startsWith(root + path.sep)) {
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
         }
 
-        const buf = await fs.readFile(resolved)           // Buffer
-        const bytes = new Uint8Array(buf)                 // <-- BodyInit (BufferSource), без SharedArrayBuffer
+        const buf = await fs.readFile(resolved)       // Buffer
+        const bytes = new Uint8Array(buf)             // BodyInit = BufferSource
         const ext = path.extname(resolved).toLowerCase()
 
         return new NextResponse(bytes, {
