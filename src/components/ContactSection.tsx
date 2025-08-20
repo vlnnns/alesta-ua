@@ -57,12 +57,13 @@ export default function ContactSection({
                 {/* Right: contact cards (dark glass) */}
                 <ul className="space-y-5">
                     {/* Email */}
+                    {/* Email */}
                     <li>
                         <a href={`mailto:${email}`} className={cardBase}>
                             <span aria-hidden className={shineSpan} />
-                            <span className="grid h-11 w-11 place-items-center rounded-xl bg-white/10 border border-white/15 text-[#D08B4C]">
-                <Mail size={18} />
-              </span>
+                            <span className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-xl bg-white/10 border border-white/15 text-[#D08B4C]">
+      <Mail className="w-6 h-6" />
+    </span>
                             <div className="min-w-0">
                                 <div className="text-white font-semibold">Email</div>
                                 <div className="truncate underline decoration-[#D08B4C]/30 underline-offset-2 transition-colors group-hover:text-[#D08B4C]">
@@ -76,9 +77,9 @@ export default function ContactSection({
                     <li>
                         <a href={`tel:${phone.replace(/[^\d+]/g, '')}`} className={cardBase}>
                             <span aria-hidden className={shineSpan} />
-                            <span className="grid h-11 w-11 place-items-center rounded-xl bg-white/10 border border-white/15 text-[#D08B4C]">
-                <Phone size={18} />
-              </span>
+                            <span className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-xl bg-white/10 border border-white/15 text-[#D08B4C]">
+      <Phone className="w-6 h-6" />
+    </span>
                             <div className="min-w-0">
                                 <div className="text-white font-semibold">Phone</div>
                                 <div className="truncate underline decoration-[#D08B4C]/30 underline-offset-2 transition-colors group-hover:text-[#D08B4C]">
@@ -92,9 +93,9 @@ export default function ContactSection({
                     <li>
                         <button type="button" className={`${cardBase} cursor-pointer w-full text-left`}>
                             <span aria-hidden className={shineSpan} />
-                            <span className="grid h-11 w-11 place-items-center rounded-xl bg-white/10 border border-white/15 text-[#D08B4C]">
-                <MapPin size={18} />
-              </span>
+                            <span className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-xl bg-white/10 border border-white/15 text-[#D08B4C]">
+      <MapPin className="w-6 h-6" />
+    </span>
                             <div className="min-w-0">
                                 <div className="text-white font-semibold">Office</div>
                                 <div className="text-white/80 transition-colors group-hover:text-[#D08B4C]">
@@ -103,6 +104,7 @@ export default function ContactSection({
                             </div>
                         </button>
                     </li>
+
                 </ul>
             </div>
         </section>
