@@ -1,81 +1,79 @@
+// app/api/admin/products/[id]/route.ts
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { Prisma } from '@prisma/client'
 
 export const runtime = 'nodejs'
-export const dynamic = 'force-dynamic'
 
-const toNum = (v: unknown) => {
-    const n = Number(typeof v === 'string' ? v : '')
-    return Number.isFinite(n) ? n : 0
-}
-const toBool = (v: unknown) => {
-    if (typeof v === 'boolean') return v
-    const s = String(v ?? '').toLowerCase()
-    return s === 'on' || s === 'true' || s === '1'
-}
+type PatchBody = Partial<{
+    type: string
+    thickness: number
+    format: string
+    grade: string
+    manufacturer: string
+    waterproofing: string
+    price: number
+    image: string
+    inStock: boolean
+}>
 
 export async function PATCH(req: Request, { params }: { params: { id: string } }) {
     try {
         const id = Number(params.id)
-        if (!Number.isFinite(id)) return NextResponse.json({ error: 'Bad id' }, { status: 400 })
+        if (!Number.isFinite(id)) return NextResponse.json({ error: 'BAD_ID' }, { status: 400 })
 
-        const ct = req.headers.get('content-type') || ''
-        let data: any = {}
+        let bodyJson: unknown
+        try { bodyJson = await req.json() } catch { bodyJson = {} }
+        const body = bodyJson as PatchBody
 
-        if (ct.includes('application/json')) {
-            const b = await req.json()
-            // быстрый путь для переключателя
-            if ('inStock' in b && Object.keys(b).length === 1) data.inStock = !!b.inStock
-            else {
-                data = {
-                    type: b.type?.trim() ?? undefined,
-                    thickness: toNum(b.thickness),
-                    format: b.format?.trim() ?? undefined,
-                    grade: b.grade?.trim() ?? undefined,
-                    manufacturer: b.manufacturer?.trim() ?? undefined,
-                    waterproofing: b.waterproofing?.trim() ?? undefined,
-                    price: toNum(b.price),
-                    inStock: !!b.inStock,
-                    image: b.image?.trim() || undefined,
-                }
-            }
-        } else {
-            const fd = await req.formData()
-            data = {
-                type: String(fd.get('type') ?? '').trim(),
-                thickness: toNum(fd.get('thickness')),
-                format: String(fd.get('format') ?? '').trim(),
-                grade: String(fd.get('grade') ?? '').trim(),
-                manufacturer: String(fd.get('manufacturer') ?? '').trim(),
-                waterproofing: String(fd.get('waterproofing') ?? '').trim(),
-                price: toNum(fd.get('price')),
-                inStock: toBool(fd.get('inStock')),
-            }
+        const data: Prisma.PlywoodProductUpdateInput = {}
 
-            // файл можно обработать здесь (S3/Cloudinary) и присвоить data.image = url
-            // если приходит imageUrl с модалки — поддержим:
-            const imageUrl = String(fd.get('imageUrl') ?? '').trim()
-            if (imageUrl) data.image = imageUrl
+        if (typeof body.type === 'string') data.type = body.type.trim()
+        if (typeof body.thickness === 'number') data.thickness = body.thickness
+        if (typeof body.format === 'string') data.format = body.format.trim()
+        if (typeof body.grade === 'string') data.grade = body.grade.trim()
+        if (typeof body.manufacturer === 'string') data.manufacturer = body.manufacturer.trim()
+        if (typeof body.waterproofing === 'string') data.waterproofing = body.waterproofing.trim()
+        if (typeof body.price === 'number') data.price = Math.max(0, body.price)
+        if (typeof body.image === 'string') data.image = body.image.trim()
+        if (typeof body.inStock === 'boolean') data.inStock = body.inStock
+
+        if ('thickness' in data && typeof data.thickness === 'number' && data.thickness <= 0) {
+            return NextResponse.json({ error: 'BAD_THICKNESS' }, { status: 400 })
         }
 
         const updated = await prisma.plywoodProduct.update({
             where: { id },
             data,
+            select: {
+                id: true,
+                type: true,
+                thickness: true,
+                format: true,
+                grade: true,
+                manufacturer: true,
+                waterproofing: true,
+                price: true,
+                image: true,
+                inStock: true,
+                createdAt: true,
+                updatedAt: true,
+            },
         })
+
         return NextResponse.json(updated)
-    } catch (e) {
-        console.error('PATCH /api/admin/products/[id] failed:', e)
-        return NextResponse.json({ error: 'Database error' }, { status: 500 })
+    } catch {
+        return NextResponse.json({ error: 'PATCH_FAILED' }, { status: 500 })
     }
 }
 
 export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
     try {
         const id = Number(params.id)
+        if (!Number.isFinite(id)) return NextResponse.json({ error: 'BAD_ID' }, { status: 400 })
         await prisma.plywoodProduct.delete({ where: { id } })
         return NextResponse.json({ ok: true })
-    } catch (e) {
-        console.error('DELETE /api/admin/products/[id] failed:', e)
-        return NextResponse.json({ error: 'Database error' }, { status: 500 })
+    } catch {
+        return NextResponse.json({ error: 'DELETE_FAILED' }, { status: 500 })
     }
 }

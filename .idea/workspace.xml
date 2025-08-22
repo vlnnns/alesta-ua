@@ -5,7 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="de175ab0-8428-40e4-8774-4f2fdb6fd17e" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/app/api/admin/products/by-type/route.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/app/api/admin/products/meta/route.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prisma/dev.db" beforeDir="false" afterPath="$PROJECT_DIR$/prisma/dev.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prisma/seed.ts" beforeDir="false" afterPath="$PROJECT_DIR$/prisma/seed.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/api/admin/products/[id]/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/api/admin/products/[id]/route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/api/admin/products/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/api/admin/products/route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/admin/AdminProductsClient.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/admin/AdminProductsClient.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,7 +60,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "ts.external.directory.path": "/Applications/WebStorm.app/Contents/plugins/javascript-plugin/jsLanguageServicesImpl/external",
+    "ts.external.directory.path": "/Users/admin/vln/work/alesta/node_modules/typescript/lib",
     "vue.rearranger.settings.migration": "true"
   },
   "keyToStringList": {
@@ -71,11 +78,11 @@
       <recent name="$PROJECT_DIR$/src/app/catalog" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/app/api/admin/products" />
+      <recent name="$PROJECT_DIR$/public/plywood" />
       <recent name="$PROJECT_DIR$/src/app/(public)/admin" />
       <recent name="$PROJECT_DIR$/src/app/(public)/admin/login/submit" />
       <recent name="$PROJECT_DIR$/src/app/(admin)" />
-      <recent name="$PROJECT_DIR$/src" />
-      <recent name="$PROJECT_DIR$" />
     </key>
   </component>
   <component name="SharedIndexes">
@@ -98,6 +105,7 @@
       <workItem from="1754765189848" duration="11144000" />
       <workItem from="1755070985098" duration="39116000" />
       <workItem from="1755681027049" duration="1443000" />
+      <workItem from="1755858791244" duration="3544000" />
     </task>
     <servers />
   </component>

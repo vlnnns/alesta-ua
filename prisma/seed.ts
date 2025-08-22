@@ -2,14 +2,142 @@
 import { PrismaClient, Prisma } from '@prisma/client'
 const prisma = new PrismaClient()
 
-const data: Prisma.PlywoodProductCreateManyInput[] = [
-    { type: 'ФСФ', thickness: 12, format: '2500x1250', grade: 'BB/BB (2/2)', manufacturer: 'Україна', waterproofing: 'Підвищена', price: 850, image: '/plywood/fsf.png', inStock: true },
-    { type: 'ФК',  thickness: 9,  format: '2500x1250', grade: 'B/BB (1/2)', manufacturer: 'Одек',    waterproofing: 'Підвищена', price: 720, image: '/plywood/fk.png',  inStock: true },
-    { type: 'Ламінована', thickness: 15, format: '3000x1500', grade: 'BB/C (2/4)', manufacturer: 'Україна', waterproofing: 'Водостійка', price: 1250, image: '/plywood/laminated.png', inStock: false },
+type Catalog = {
+    type: string
+    thicknesses: number[]
+    formats: string[]
+    grades: string[]
+    waterproofing: string
+    image: string
+    priceBase: number
+    pricePerMm: number
+}
+
+const CATALOG: Catalog[] = [
+    {
+        type: 'ФСФ',
+        thicknesses: [4, 6, 6.5, 7, 9, 9.5, 10, 12, 15, 18, 21, 24, 27, 30, 35, 40],
+        formats: ['2500x1250', '3000x1500'],
+        grades: ['B/BB (1/2)','BB/BB (2/2)','BB/C (2/4)','BB/CP (2/3)','C/C (4/4)','CP/C (3/4)','CP/CP (3/3)'],
+        waterproofing: 'Підвищена',
+        image: '/plywood/fsf.png',
+        priceBase: 2300,
+        pricePerMm: 210,
+    },
+    {
+        type: 'ФК',
+        thicknesses: [3,4,5,5.5,6,6.5,7,8,9,10,12,15,16,18,21,22,24,27,30],
+        formats: ['1525x1525','2500x1250'],
+        grades: ['B/B (1/1)','B/BB (1/2)','BB/BB (2/2)','BB/C (2/4)','BB/CP (2/3)','C/C (4/4)','CP/C (3/4)','CP/CP (3/3)'],
+        waterproofing: 'Вологостійка',
+        image: '/plywood/fk.png',
+        priceBase: 1400,
+        pricePerMm: 120,
+    },
+    {
+        type: 'ФКМ',
+        thicknesses: [4,6,7,10,12,15,18,21,24,27],
+        formats: ['2500x1250'],
+        grades: ['BB/BB (2/2)','BB/C (2/4)','BB/CP (2/3)','CP/C (3/4)','CP/CP (3/3)'],
+        waterproofing: 'Підвищена',
+        image: '/plywood/fkm.png',
+        priceBase: 1600,
+        pricePerMm: 140,
+    },
+    {
+        type: 'Ламінована',
+        thicknesses: [6,6.5,9,9.5,12,15,18,21,24,27,30,35,40],
+        formats: ['2500x1250','3000x1500'],
+        grades: ['гладка/гладка (F/F)','гладка/сітка (F/W)'],
+        waterproofing: 'Водостійка',
+        image: '/plywood/laminated.png',
+        priceBase: 2500,
+        pricePerMm: 220,
+    },
+    {
+        type: 'Для Лазера',
+        thicknesses: [3,4,5,6,8,10,12,15],
+        formats: ['900x600','1525x1525','2500x1250'],
+        grades: ['B/B (1/1)','B/BB (1/2)','BB/BB (2/2)'],
+        waterproofing: 'Вологостійка',
+        image: '/plywood/laser.png',
+        priceBase: 1200,
+        pricePerMm: 100,
+    },
+    {
+        type: 'Транспортна',
+        thicknesses: [12,15,18,21,24,27,30,35,40],
+        formats: ['2500x1250','3000x1500'],
+        grades: ['гладка/сітка (F/W)'],
+        waterproofing: 'Водостійка',
+        image: '/plywood/transport.png',
+        priceBase: 2700,
+        pricePerMm: 230,
+    },
+    {
+        type: 'Для Опалубки',
+        thicknesses: [12,15,18,21,24,27,30,35,40],
+        formats: ['2500x1250','3000x1500'],
+        grades: ['гладка/гладка (F/F)'],
+        waterproofing: 'Водостійка',
+        image: '/plywood/formwork.png',
+        priceBase: 2600,
+        pricePerMm: 225,
+    },
 ]
 
+// формула ціни
+const priceFor = (cfg: Catalog, t: number, f: string) =>
+    Math.round((cfg.priceBase + cfg.pricePerMm * t) * (f === '3000x1500' ? 1.15 : 1))
+
+function* generateAll(): Generator<Prisma.PlywoodProductCreateManyInput> {
+    for (const cfg of CATALOG) {
+        for (const t of cfg.thicknesses) {
+            for (const f of cfg.formats) {
+                for (const g of cfg.grades) {
+                    yield {
+                        type: cfg.type,
+                        thickness: t,
+                        format: f,
+                        grade: g,
+                        manufacturer: 'Україна',
+                        waterproofing: cfg.waterproofing,
+                        price: priceFor(cfg, t, f),
+                        image: cfg.image,
+                        inStock: true,
+                    }
+                }
+            }
+        }
+    }
+}
+
 async function main() {
-    for (const d of data) {
+    // 0) Нормалізація: прибираємо всі записи, де виробник != "Україна"
+    const toDelete = await prisma.plywoodProduct.count({
+        where: { manufacturer: { notIn: ['Україна'] } },
+    })
+    if (toDelete > 0) {
+        await prisma.plywoodProduct.deleteMany({
+            where: { manufacturer: { notIn: ['Україна'] } },
+        })
+    }
+    console.log(`🧹 Видалено записів з чужим виробником: ${toDelete}`)
+
+    // 1) Перейменування старих назв
+    const rename: Record<string, string> = {
+        'Фанера для Лазера': 'Для Лазера',
+        'Фанера Транспортна': 'Транспортна',
+        'Фанера для Опалубки': 'Для Опалубки',
+    }
+    for (const [from, to] of Object.entries(rename)) {
+        const res = await prisma.plywoodProduct.updateMany({ where: { type: from }, data: { type: to } })
+        if (res.count > 0) console.log(`✏️ Перейменовано "${from}" → "${to}": ${res.count}`)
+    }
+
+    // 2) Upsert усіх комбінацій
+    let created = 0, updated = 0
+    for (const d of generateAll()) {
         const existing = await prisma.plywoodProduct.findFirst({
             where: {
                 type: d.type,
@@ -22,15 +150,18 @@ async function main() {
         })
 
         if (existing) {
-            await prisma.plywoodProduct.update({
-                where: { id: existing.id },
-                data: d,
-            })
+            await prisma.plywoodProduct.update({ where: { id: existing.id }, data: d })
+            updated++
         } else {
             await prisma.plywoodProduct.create({ data: d })
+            created++
         }
     }
-    console.log('🌱 Seed успішно виконано')
+
+    const total = await prisma.plywoodProduct.count()
+    console.log(`🌱 Seed OK · created: ${created} · updated: ${updated} · total now: ${total}`)
 }
 
-main().finally(() => prisma.$disconnect())
+main()
+    .catch((e) => { console.error(e); process.exit(1) })
+    .finally(() => prisma.$disconnect())
