@@ -75,17 +75,17 @@ export default function TrustedPartnerSection({
                                     <div
                                         key={s.n + s.t}
                                         className={clsx(
-                                            'rounded-xl px-2 py-2 flex flex-col items-center text-center min-h-[110px]',
-                                            isDark
-                                                ? 'bg-[#D08B4C]/80 text-white'
-                                                : 'bg-[#D08B4C]/90 text-white'
+                                            // ✅ додано justify-center
+                                            'rounded-xl px-2 py-2 min-h-[110px] flex flex-col items-center justify-center text-center',
+                                            isDark ? 'bg-[#D08B4C]/80 text-white' : 'bg-[#D08B4C]/90 text-white'
                                         )}
                                     >
-                                        <div className="text-2xl sm:text-3xl font-bold leading-none">{s.n}</div>
-                                        <p className="mt-2 text-xs leading-snug opacity-95">{s.t}</p>
+                                        <div className="text-2xl sm:text-3xl font-bold leading-none text-center">{s.n}</div>
+                                        <p className="mt-2 text-xs leading-snug opacity-95 text-center">{s.t}</p>
                                     </div>
                                 ))}
                             </div>
+
 
                             {/* Description */}
                             <p

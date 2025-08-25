@@ -207,14 +207,13 @@ export default function ProductCard({
                     'absolute inset-0 flex flex-col justify-between p-4 bg-white/90',
                     'transition-transform duration-500 ease-out',
                     isOpen ? 'translate-y-0' : 'translate-y-full',
+                    'text-sm' // 🔹 ставимо базовий розмір тексту менший
                 ].join(' ')}
             >
                 <div className="space-y-1">
-                    <h3 className="mb-2 flex items-center gap-2 text-lg font-semibold text-neutral-900">
-                        {/* Убрали слово “Фанера” */}
+                    <h3 className="mb-2 flex items-center gap-2 text-base font-medium text-neutral-900">
                         {product.type} {product.thickness} мм
                         <StockBadge inStock={inStock} className="ml-auto" size="sm" />
-
                     </h3>
 
                     <Select
@@ -222,6 +221,7 @@ export default function ProductCard({
                         value={type}
                         onChange={setType}
                         options={optTypes.map(v => ({ value: v, label: v }))}
+                        className="text-xs" // 🔹 дрібніший текст у селектах
                     />
 
                     <Select
@@ -229,11 +229,12 @@ export default function ProductCard({
                         value={waterproofing}
                         onChange={setWaterproofing}
                         options={optWater.map(v => ({ value: v, label: v }))}
+                        className="text-xs"
                     />
 
                     <div className="flex gap-2">
                         <Select
-                            className="w-1/2"
+                            className="w-1/2 text-xs"
                             label="Товщина"
                             value={String(thickness)}
                             onChange={(v) => setThickness(Number(v))}
@@ -243,7 +244,7 @@ export default function ProductCard({
                                 .map(v => ({ value: String(v), label: `${v} мм` }))}
                         />
                         <Select
-                            className="w-1/2"
+                            className="w-1/2 text-xs"
                             label="Формат листа"
                             value={format}
                             onChange={setFormat}
@@ -256,9 +257,9 @@ export default function ProductCard({
                         value={grade}
                         onChange={setGrade}
                         options={optGrades.map(v => ({ value: v, label: v }))}
+                        className="text-xs"
                     />
 
-                    <input type="hidden" value={manufacturer} readOnly />
                     {!inStock && (
                         <p className="mt-2 text-xs text-red-600">
                             Товар наразі відсутній — додавання до кошика вимкнено.

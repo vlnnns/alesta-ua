@@ -1,3 +1,4 @@
+// components/quiz/StepShell.tsx
 'use client'
 
 import { ReactNode } from 'react'

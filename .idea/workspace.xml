@@ -5,14 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="de175ab0-8428-40e4-8774-4f2fdb6fd17e" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/app/api/admin/products/by-type/route.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/app/api/admin/products/meta/route.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/prisma/dev.db" beforeDir="false" afterPath="$PROJECT_DIR$/prisma/dev.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/prisma/seed.ts" beforeDir="false" afterPath="$PROJECT_DIR$/prisma/seed.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/api/admin/products/[id]/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/api/admin/products/[id]/route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/api/admin/products/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/api/admin/products/route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/admin/AdminProductsClient.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/admin/AdminProductsClient.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,30 +38,30 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "main",
-    "javascript.nodejs.core.library.configured.version": "22.17.1",
-    "javascript.nodejs.core.library.typings.version": "22.17.2",
-    "last_opened_file_path": "/Users/admin/vln/work/alesta/src/app/checkout",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "ts.external.directory.path": "/Users/admin/vln/work/alesta/node_modules/typescript/lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;javascript.nodejs.core.library.configured.version&quot;: &quot;22.17.1&quot;,
+    &quot;javascript.nodejs.core.library.typings.version&quot;: &quot;22.17.2&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/admin/vln/work/alesta/src/app/checkout&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/Users/admin/vln/work/alesta/node_modules/typescript/lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "sqlite"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;sqlite&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/app/checkout" />
@@ -105,7 +98,8 @@
       <workItem from="1754765189848" duration="11144000" />
       <workItem from="1755070985098" duration="39116000" />
       <workItem from="1755681027049" duration="1443000" />
-      <workItem from="1755858791244" duration="3544000" />
+      <workItem from="1755858791244" duration="4075000" />
+      <workItem from="1756066125219" duration="325000" />
     </task>
     <servers />
   </component>

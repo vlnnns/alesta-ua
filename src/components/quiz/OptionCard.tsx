@@ -1,22 +1,22 @@
+// components/quiz/OptionCard.tsx
 'use client'
 
-import Image from 'next/image'
 import { optionDescriptions, optionImages } from '@/data/quizOptions'
 
 type Props = {
     option: string
     isActive: boolean
-    onClick: () => void
+    onToggle: () => void
 }
 
-export default function OptionCard({ option, isActive, onClick }: Props) {
+export default function OptionCard({ option, isActive, onToggle }: Props) {
     const img = optionImages[option]
 
     return (
         <button
             type="button"
-            onClick={onClick}
-            role="radio"
+            onClick={onToggle}
+            role="checkbox"
             aria-checked={isActive}
             className={`
         group relative text-left rounded-md border overflow-hidden
@@ -33,9 +33,11 @@ export default function OptionCard({ option, isActive, onClick }: Props) {
                         вибрано
                     </div>
                 )}
+                {/* за бажанням можна вивести зображення:
+        {img && <img src={img} alt="" className="w-full h-20 object-cover" />} */}
             </div>
 
-            <div className="h-[100%] grid content-center text-center">
+            <div className="h-[100%] grid content-center text-center px-2">
                 <div className="text-[11px] text-neutral-500 line-clamp-2">
                     {optionDescriptions[option] || '\u00A0'}
                 </div>

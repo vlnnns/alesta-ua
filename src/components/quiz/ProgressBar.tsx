@@ -5,7 +5,7 @@ type Props = { currentStep: number; totalSteps: number }
 export default function ProgressBar({ currentStep, totalSteps }: Props) {
     const percent = Math.round(((currentStep + 1) / totalSteps) * 100)
     return (
-        <div className="px-5 pt-5 pb-3 flex items-center justify-between">
+        <div className="flex items-center justify-between gap-4">
             <p className="text-xs sm:text-sm text-neutral-500">
                 крок <span className="font-medium text-neutral-800">{currentStep + 1}</span> з {totalSteps}
             </p>
