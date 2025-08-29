@@ -3,118 +3,95 @@ const prisma = new PrismaClient()
 
 async function main() {
     await prisma.blogPost.upsert({
-        where: { slug: 'fsf-vs-fk-riznytsia-ta-vybir' },
+        where: { slug: 'ispm-15-certification-what-it-means' },
         update: {},
         create: {
-            slug: 'fsf-vs-fk-riznytsia-ta-vybir',
-            title: 'ФСФ vs ФК: у чому різниця і що обрати?',
-            category: 'Гід по вибору',
+            slug: 'ispm-15-certification-what-it-means',
+            title: 'Сертифікація ISPM 15: що це означає на практиці',
+            excerpt:
+                'ISPM 15 — міжнародний фітосанітарний стандарт для деревʼяної тари. Розбираємося, коли він потрібен, як читається маркування IPPC, які методи обробки існують та чому фанера/OSB зазвичай звільнені.',
+            coverImage: null,            // можеш замінити на свій банер
+            category: 'Сертифікація',
             featured: false,
             published: true,
             publishedAt: new Date(),
-            coverImage: null, // за потреби додай власний банер
-            excerpt:
-                'Пояснюємо різницю між фанерою ФСФ та ФК: тип клею, вологостійкість, міцність і реальні сценарії використання. Поради для вибору під покрівлю, підлогу, меблі чи опалубку.',
-
             bodyHtml: `
 <section>
   <p>
-    При виборі фанери перше запитання — <strong>який тип клею</strong> і як це
-    впливає на <strong>вологостійкість</strong> та сферу застосування. Найпоширеніші
-    варіанти — <strong>ФСФ</strong> та <strong>ФК</strong>. Нижче — просте порівняння,
-    яке допоможе обрати матеріал під ваше завдання.
+    <strong>ISPM 15</strong> — це міжнародний фітосанітарний стандарт для
+    деревʼяного пакувального матеріалу, який використовується при міжнародних
+    відправленнях. Його мета — не допустити поширення шкідників разом із
+    тарою (палети, ящики, дрантя тощо).
   </p>
 </section>
 
 <section>
-  <h2>Коротко про головне</h2>
+  <h2>Коли потрібен ISPM 15</h2>
   <ul>
-    <li><strong>ФСФ</strong> — підвищена водостійкість, витримує складні умови зовні та вологі середовища.</li>
-    <li><strong>ФК</strong> — вологостійка фанера для інтер’єру: меблі, оздоблення, сухі/помірно вологі приміщення.</li>
+    <li>для <strong>міжнародних відправлень</strong> у деревʼяній тарі з масиву (товщина &gt; 6&nbsp;мм);</li>
+    <li>для палет, ящиків, підкладок/дрантя (dunnage), що супроводжують вантаж;</li>
+    <li>не потрібен для внутрішніх перевезень в межах країни.</li>
   </ul>
 </section>
 
 <section>
-  <h2>Порівняння ФСФ і ФК</h2>
-  <table style="width:100%;border-collapse:collapse">
-    <thead>
-      <tr>
-        <th style="text-align:left;border-bottom:1px solid #e5e7eb;padding:8px">Критерій</th>
-        <th style="text-align:left;border-bottom:1px solid #e5e7eb;padding:8px">ФСФ</th>
-        <th style="text-align:left;border-bottom:1px solid #e5e7eb;padding:8px">ФК</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td style="padding:8px;border-bottom:1px solid #f0f0f0">Вологостійкість</td>
-        <td style="padding:8px;border-bottom:1px solid #f0f0f0"><strong>Висока</strong> (підвищена водостійкість)</td>
-        <td style="padding:8px;border-bottom:1px solid #f0f0f0"><strong>Середня</strong> (вологостійка)</td>
-      </tr>
-      <tr>
-        <td style="padding:8px;border-bottom:1px solid #f0f0f0">Сфера застосування</td>
-        <td style="padding:8px;border-bottom:1px solid #f0f0f0">Опалубка, підлоги, покрівельна основа, транспорт/тара, вуличні роботи</td>
-        <td style="padding:8px;border-bottom:1px solid #f0f0f0">Меблі, інтер’єрні панелі, оздоблення, DIY у приміщенні</td>
-      </tr>
-      <tr>
-        <td style="padding:8px;border-bottom:1px solid #f0f0f0">Міцність/жорсткість</td>
-        <td style="padding:8px;border-bottom:1px solid #f0f0f0">Підвищена, стабільна під навантаженнями</td>
-        <td style="padding:8px;border-bottom:1px solid #f0f0f0">Достатня для інтер’єрних задач</td>
-      </tr>
-      <tr>
-        <td style="padding:8px;border-bottom:1px solid #f0f0f0">Де краще не використовувати</td>
-        <td style="padding:8px;border-bottom:1px solid #f0f0f0">Витончені інтер’єрні фасади, де критична мінімальна емісія — краще спеціальні плити/шпон</td>
-        <td style="padding:8px;border-bottom:1px solid #f0f0f0">Позаприміщенням та у зонах постійної вологи</td>
-      </tr>
-    </tbody>
-  </table>
-</section>
-
-<section>
-  <h2>Що обрати в типових сценаріях</h2>
-  <ul>
-    <li><strong>Основа під покрівлю, підлога у підсобних приміщеннях, чорнова підлога:</strong> ФСФ.</li>
-    <li><strong>Опалубка, тимчасові конструкції:</strong> ФСФ (можна брати ламіновану для більшої зносостійкості).</li>
-    <li><strong>Меблі, полиці, оздоблення стін у житлових кімнатах:</strong> ФК.</li>
-    <li><strong>DIY у квартирі (декор, прості предмети):</strong> ФК.</li>
-  </ul>
-</section>
-
-<section>
-  <h2>Товщини та формати</h2>
+  <h2>Хто звільнений від ISPM 15</h2>
   <p>
-    Найпоширеніші формати: <em>1525×1525, 2500×1250, 3000×1500</em>. Точний набір залежить від типу фанери та партії.
-    Для жорстких основ (підлога, дах) зазвичай беруть <strong>18–21&nbsp;мм</strong>, для меблевих корпусів — <strong>12–18&nbsp;мм</strong>,
-    для декоративних панелей — <strong>6–10&nbsp;мм</strong>.
+    Стандарт <em>не поширюється</em> на деревні матеріали, які перероблені таким
+    чином, що вважаються вільними від шкідників: <strong>фанера, OSB, MDF, ДВП</strong>,
+    інші плити, а також тара з <strong>картону, пластику, металу</strong>.
   </p>
 </section>
 
 <section>
-  <h2>Поради з монтажу</h2>
+  <h2>Методи обробки</h2>
   <ul>
-    <li>Під час зовнішніх робіт крайки захищайте фарбою/лаком — це подовжує ресурс.</li>
-    <li>Використовуйте еластичні клеї/герметики у вузлах, де можливі деформації.</li>
-    <li>Залишайте компенсаційні шви 2–3&nbsp;мм між листами на великій площі.</li>
+    <li><strong>HT</strong> (Heat Treatment) — термообробка: нагрів до щонайменше
+      <strong>56&nbsp;°C</strong> у серцевині деревини протягом <strong>30 хв</strong>.</li>
+    <li><strong>MB</strong> (Methyl Bromide) — фумігація метилбромідом
+      (у багатьох країнах обмежена/заборонена, рекомендовано HT).</li>
   </ul>
 </section>
 
 <section>
-  <h2>Питання та відповіді</h2>
-  <p><strong>Чи можна ФК у ванній?</strong><br/> Краще уникати тривалої прямої вологи; для таких зон обирайте ФСФ або інші матеріали з вищою вологостійкістю.</p>
-  <p><strong>Чи обовʼязково брати ламіновану?</strong><br/> Для опалубки та інтенсивного зносу — так, ламінована поверхня служить довше і легше очищується.</p>
+  <h2>Маркування IPPC: як читати</h2>
+  <p>На тарі ставиться прямокутний знак із «колоском» IPPC. Приклад:</p>
+  <pre style="background:#f6f6f6;padding:12px;border-radius:8px;">XX-000 HT KD</pre>
+  <ul>
+    <li><strong>XX</strong> — код країни (наприклад, UA, PL, TR);</li>
+    <li><strong>000</strong> — унікальний номер виробника/оператора обробки;</li>
+    <li><strong>HT</strong> — метод: термообробка; <strong>MB</strong> — фумігація;</li>
+    <li><strong>KD</strong> — інколи додають «kiln dried» (камерна сушка).</li>
+  </ul>
 </section>
 
 <section>
-  <h2>Перейти до каталогу</h2>
-  <p>
-    <a href="/catalog?type=%D0%A4%D0%A1%D0%A4">Подивитися ФСФ</a> ·
-    <a href="/catalog?type=%D0%A4%D0%9A">Подивитися ФК</a>
-  </p>
+  <h2>Що це означає для клієнтів Alesta</h2>
+  <ul>
+    <li>Якщо ви <strong>експортуєте</strong> продукцію, перевіряйте, щоб палети/ящики мали дійсне
+      маркування IPPC за ISPM 15.</li>
+    <li><strong>Фанера, OSB, MDF</strong> як матеріал не потребують маркування ISPM 15 —
+      вимоги стосуються саме <em>деревʼяної тари з масиву</em>.</li>
+    <li>За потреби допоможемо підібрати сертифіковану тару для відвантажень.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Питання-відповіді</h2>
+  <p><strong>Чи потрібен ISPM 15 на саму фанеру?</strong><br/>
+     Ні. Фанера та інші інженерні плити звільнені. Сертифікація потрібна для
+     деревʼяної тари з масиву при міжнародних відправленнях.</p>
+  <p><strong>А якщо відправляю по Україні?</strong><br/>
+     ISPM 15 не вимагається для внутрішніх перевезень.</p>
+  <p><strong>Який метод кращий?</strong><br/>
+     Рекомендовано <strong>HT</strong> (термообробка). Фумігація MB у ряді країн
+     обмежена.</p>
 </section>
       `.trim(),
         },
     })
 
-    console.log('✓ Blog post seeded: fsf-vs-fk-riznytsia-ta-vybir')
+    console.log('✓ Blog post seeded: ispm-15-certification-what-it-means')
 }
 
 main()

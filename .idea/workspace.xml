@@ -5,39 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="de175ab0-8428-40e4-8774-4f2fdb6fd17e" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/prisma/seed-blog.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/app/(admin)/admin/blog/[id]/edit/page.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/app/(admin)/admin/blog/delete/route.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/app/(admin)/admin/blog/new/page.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/app/(admin)/admin/blog/page.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/blog/AdminPostForm.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/blog/BlogSectionServer.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/blog/ConfirmDeleteButton.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/catalog/FiltersBar.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/catalog/SingleFilterPicker.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/lib/plainText.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/lib/slugify.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/prisma/dev.db" beforeDir="false" afterPath="$PROJECT_DIR$/prisma/dev.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/prisma/schema.prisma" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/prisma/seed.ts" beforeDir="false" afterPath="$PROJECT_DIR$/prisma/seed.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/(admin)/admin/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/(admin)/admin/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/about/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/about/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/blog/[slug]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/blog/[slug]/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/blog/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/blog/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/catalog/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/catalog/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/ContactSection.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/ContactSection.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/Footer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Footer.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/RecommendedProducts.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/RecommendedProducts.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/cart/CartDrawer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/cart/CartDrawer.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/cart/CartPageClient.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/cart/CartPageClient.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/catalog/CatalogProductGrid.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/catalog/CatalogProductGrid.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/catalog/TypeFilterPicker.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/product/ProductCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/product/ProductCard.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/quiz/OptionCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/quiz/OptionCard.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/quiz/QuizStep.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/quiz/QuizStep.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/data/blog.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/data/blog.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -135,7 +103,7 @@
       <workItem from="1756233104073" duration="740000" />
       <workItem from="1756282109200" duration="1274000" />
       <workItem from="1756360140776" duration="2960000" />
-      <workItem from="1756396011915" duration="12232000" />
+      <workItem from="1756396011915" duration="13913000" />
     </task>
     <servers />
   </component>
