@@ -5,11 +5,11 @@ import type { PlywoodProduct } from '@prisma/client'
 import ProductCard, { type ProductCardOptions } from '@/components/product/ProductCard'
 import { useCart } from '@/components/cart/CartProvider'
 
-// карусель
 import useEmblaCarousel from 'embla-carousel-react'
 import { IoChevronBack, IoChevronForward } from 'react-icons/io5'
 
 const BRAND = '#D08B4C'
+const MAX = 4
 
 type Expanded = Record<number, boolean>
 
@@ -27,10 +27,13 @@ export default function RecommendedProducts() {
             try {
                 setLoading(true)
                 setError(null)
-                const res = await fetch('/api/recommend?limit=12', { cache: 'no-store', signal: ac.signal })
+                // просим у API максимум 6
+                const res = await fetch(`/api/recommend?limit=${MAX}`, { cache: 'no-store', signal: ac.signal })
                 if (!res.ok) throw new Error(`HTTP ${res.status}`)
-                const data = (await res.json()) as unknown
-                setProducts(Array.isArray(data) ? (data as PlywoodProduct[]) : [])
+                const data = await res.json()
+                // и всё равно режем на клиенте до 6
+                const list = Array.isArray(data) ? (data as PlywoodProduct[]) : []
+                setProducts(list.slice(0, MAX))
             } catch (e: unknown) {
                 const aborted = e instanceof DOMException && e.name === 'AbortError'
                 if (!aborted) setError('Не вдалося завантажити рекомендації')
@@ -41,19 +44,22 @@ export default function RecommendedProducts() {
         return () => ac.abort()
     }, [])
 
+    // используем именно "видимые" элементы (у нас и так уже 0..6)
+    const items = useMemo(() => products.slice(0, MAX), [products])
+
     const toggle = (id: number) => setExpanded(prev => ({ ...prev, [id]: !prev[id] }))
 
     const options: ProductCardOptions = useMemo(() => {
         const uniq = <T,>(arr: T[]) => [...new Set(arr.filter(Boolean) as T[])]
         return {
-            types:          uniq(products.map(p => p.type)),
-            thicknesses:    uniq(products.map(p => p.thickness)).sort((a,b)=>Number(a)-Number(b)),
-            formats:        uniq(products.map(p => p.format)),
-            grades:         uniq(products.map(p => p.grade)),
-            manufacturers:  uniq(products.map(p => p.manufacturer)),
-            waterproofings: uniq(products.map(p => p.waterproofing)),
+            types:          uniq(items.map(p => p.type)),
+            thicknesses:    uniq(items.map(p => p.thickness)).sort((a,b)=>Number(a)-Number(b)),
+            formats:        uniq(items.map(p => p.format)),
+            grades:         uniq(items.map(p => p.grade)),
+            manufacturers:  uniq(items.map(p => p.manufacturer)),
+            waterproofings: uniq(items.map(p => p.waterproofing)),
         }
-    }, [products])
+    }, [items])
 
     const handleSubmit = (payload: {
         id: number
@@ -64,7 +70,7 @@ export default function RecommendedProducts() {
         manufacturer: string
         waterproofing: string
     }) => {
-        const p = products.find(x => x.id === payload.id)
+        const p = items.find(x => x.id === payload.id)
         if (!p) return
         addItem({
             productId: p.id,
@@ -95,7 +101,6 @@ export default function RecommendedProducts() {
     const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi])
     const scrollTo   = useCallback((i: number) => emblaApi?.scrollTo(i), [emblaApi])
 
-    // індикатори/активний слайд
     const [selectedIndex, setSelectedIndex] = useState(0)
     const [snapCount, setSnapCount] = useState(0)
 
@@ -120,16 +125,15 @@ export default function RecommendedProducts() {
                     <p className="text-white/70">Завантаження…</p>
                 ) : error ? (
                     <p className="text-red-300">{error}</p>
-                ) : products.length === 0 ? (
+                ) : items.length === 0 ? (
                     <p className="text-white/70">Поки немає рекомендацій.</p>
                 ) : (
                     <>
-                        {/* 🔹 Мобільна карусель + нижня навігація */}
+                        {/* 🔹 Мобільна карусель */}
                         <div className="md:hidden">
-                            {/* viewport */}
                             <div className="overflow-hidden px-1" ref={emblaRef}>
                                 <div className="flex gap-4">
-                                    {products.map((p) => (
+                                    {items.map((p) => (
                                         <div key={p.id} className="basis-[78%] shrink-0">
                                             <ProductCard
                                                 product={p}
@@ -145,7 +149,7 @@ export default function RecommendedProducts() {
                                 </div>
                             </div>
 
-                            {/* 🔸 нижняя навигация как на скрине */}
+                            {/* навигация */}
                             <div className="mt-5 flex items-center justify-start gap-5">
                                 <button
                                     onClick={scrollPrev}
@@ -182,9 +186,9 @@ export default function RecommendedProducts() {
                             </div>
                         </div>
 
-                        {/* 🔹 Десктоп/планшет — стандартна сітка */}
+                        {/* 🔹 Десктоп/планшет */}
                         <div className="hidden md:grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            {products.map(p => (
+                            {items.map(p => (
                                 <ProductCard
                                     key={p.id}
                                     product={p}

@@ -32,20 +32,19 @@ export default function Footer() {
 
                         <div className="space-y-5 text-sm sm:text-base">
                             <div>
-                                <div className="text-neutral-400">+38 (067) 767 7077</div>
-                                <div className="text-neutral-500">Якщо є запитання</div>
+                                <div className="text-neutral-400">+38 (066) 987 91 16</div>
                             </div>
 
                             <div>
                                 <div className="font-medium">Електронна пошта:</div>
-                                <a href="mailto:info@alestaua.com" className="text-neutral-300 hover:text-white transition">
-                                    info@alestaua.com
+                                <a href="mailto:alesta.ply@gmail.com" className="text-neutral-300 hover:text-white transition">
+                                    alesta.ply@gmail.com
                                 </a>
                             </div>
 
                             <div>
                                 <div className="font-medium">Адреса:</div>
-                                <div className="text-neutral-300"> Vul. Dmytra Vitovsʹkoho,Halych, Ivano-Frankivska oblast, Ukrayna, Галич, Івано-Франківська область, 77100</div>
+                                <div className="text-neutral-300">Івано-Франківська обл, Угринів, калуське шосе 2 3/1</div>
                             </div>
                         </div>
                     </div>
@@ -54,32 +53,32 @@ export default function Footer() {
                     <div className="flex flex-col items-start lg:items-end gap-6">
                         {/* соц */}
                         <div className="flex items-center gap-3">
-                            <a
-                                href="https://facebook.com"
-                                target="_blank"
-                                rel="noreferrer"
-                                aria-label="Facebook"
-                                className="grid h-9 w-9 place-items-center rounded-full bg-white/10 hover:bg-white/15 transition"
-                            >
-                                {/* facebook svg */}
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-white">
-                                    <path d="M13.5 21v-7h2.5l.5-3h-3V9.1c0-.9.3-1.5 1.6-1.5H16V5.1c-.3 0-1.2-.1-2.2-.1-2.2 0-3.6 1.3-3.6 3.7V11H8v3h2.2v7h3.3Z" fill="currentColor"/>
-                                </svg>
-                            </a>
-                            <a
-                                href="https://instagram.com"
-                                target="_blank"
-                                rel="noreferrer"
-                                aria-label="Instagram"
-                                className="grid h-9 w-9 place-items-center rounded-full bg-white/10 hover:bg-white/15 transition"
-                            >
-                                {/* instagram svg */}
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-white">
-                                    <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" strokeWidth="2"/>
-                                    <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="2"/>
-                                    <circle cx="17.5" cy="6.5" r="1.2" fill="currentColor"/>
-                                </svg>
-                            </a>
+                            {/*<a*/}
+                            {/*    href="https://facebook.com"*/}
+                            {/*    target="_blank"*/}
+                            {/*    rel="noreferrer"*/}
+                            {/*    aria-label="Facebook"*/}
+                            {/*    className="grid h-9 w-9 place-items-center rounded-full bg-white/10 hover:bg-white/15 transition"*/}
+                            {/*>*/}
+                            {/*    /!* facebook svg *!/*/}
+                            {/*    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-white">*/}
+                            {/*        <path d="M13.5 21v-7h2.5l.5-3h-3V9.1c0-.9.3-1.5 1.6-1.5H16V5.1c-.3 0-1.2-.1-2.2-.1-2.2 0-3.6 1.3-3.6 3.7V11H8v3h2.2v7h3.3Z" fill="currentColor"/>*/}
+                            {/*    </svg>*/}
+                            {/*</a>*/}
+                            {/*<a*/}
+                            {/*    href="https://instagram.com"*/}
+                            {/*    target="_blank"*/}
+                            {/*    rel="noreferrer"*/}
+                            {/*    aria-label="Instagram"*/}
+                            {/*    className="grid h-9 w-9 place-items-center rounded-full bg-white/10 hover:bg-white/15 transition"*/}
+                            {/*>*/}
+                            {/*    /!* instagram svg *!/*/}
+                            {/*    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-white">*/}
+                            {/*        <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" strokeWidth="2"/>*/}
+                            {/*        <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="2"/>*/}
+                            {/*        <circle cx="17.5" cy="6.5" r="1.2" fill="currentColor"/>*/}
+                            {/*    </svg>*/}
+                            {/*</a>*/}
                         </div>
 
                         {/* логотип */}

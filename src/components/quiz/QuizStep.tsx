@@ -50,11 +50,8 @@ export default function QuizStep({
             <div className="px-5 pt-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 mb-4">
                 <ProgressBar currentStep={currentStep} totalSteps={totalSteps} />
                 <div className="flex items-center gap-2 whitespace-nowrap">
-                    <Link href="/" className="text-xs sm:text-sm px-3 py-1.5 rounded-lg border border-neutral-300 hover:bg-neutral-100">
-                        На головну
-                    </Link>
-                    <Link href="/catalog" className="text-xs sm:text-sm px-3 py-1.5 rounded-lg border border-neutral-300 hover:bg-neutral-100">
-                        Весь каталог
+                    <Link href="/catalog" className="text-xs text-neutral-500 sm:text-sm rounded-lg hover:text-[#D08B4C]">
+                        Переглянути весь каталог
                     </Link>
                 </div>
             </div>
@@ -94,10 +91,14 @@ export default function QuizStep({
     )
 
     return (
+        // усередині QuizStep return(...)
         <StepShell header={header} footer={footer}>
             <div className="px-5 py-5">
                 <div
-                    className="flex flex-wrap justify-center gap-4"
+                    className="
+        grid grid-cols-2 gap-3
+        sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5
+        "
                     role="group"
                     aria-label={`${title} (мультивибір)`}
                     aria-multiselectable="true"
@@ -113,5 +114,6 @@ export default function QuizStep({
                 </div>
             </div>
         </StepShell>
+
     )
 }

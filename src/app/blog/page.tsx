@@ -1,19 +1,22 @@
 // app/blog/page.tsx
 import Link from 'next/link'
-import BlogSection from "@/components/blog/BlogSection";
+import BlogSectionServer from '@/components/blog/BlogSectionServer'
 
 export const metadata = {
     title: 'Блог',
     description: 'Ідеї, DIY та натхнення з фанерою',
 }
 
-export default function BlogPage() {
+// чтобы не залип старый 404/ISR
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+export default async function BlogPage() {
     return (
         <main className="py-12 bg-white">
             <div className="max-w-7xl mx-auto">
-                {/* Хлібні крошки */}
                 <nav className="mb-6 text-sm text-neutral-500 flex gap-2 items-center px-6">
-                    <Link href="/" className="hover:underline cursor-pointer">Головна</Link>
+                    <Link href="/" className="hover:underline">Головна</Link>
                     <span>/</span>
                     <span className="text-neutral-800">Блог</span>
                 </nav>
@@ -22,8 +25,7 @@ export default function BlogPage() {
                     Блог
                 </h1>
 
-                <BlogSection />
-
+                <BlogSectionServer />
             </div>
         </main>
     )

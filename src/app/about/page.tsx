@@ -127,22 +127,22 @@ export default function AboutPage() {
                         <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">Якість та відповідність</h2>
                         <p className="mt-4 text-white/80">
                             Дотримуємось міжнародних стандартів якості й безпеки. Пакувальні рішення підтримують
-                            вимоги глобальної логістики (ISPM-15), а приклади сертифікатів доступні для перегляду.
+                            вимоги глобальної логістики (ISPM-15).
                         </p>
-                        <div className="mt-6 flex flex-wrap gap-3">
-                            <Link
-                                href="/certifications"
-                                className="inline-flex items-center gap-2 rounded-xl px-4 py-2 border border-white/15 text-white/90 hover:bg-white/10"
-                            >
-                                Сертифікації
-                            </Link>
-                            <Link
-                                href="/contacts"
-                                className="inline-flex items-center gap-2 rounded-xl px-4 py-2 border border-[#D08B4C]/70 text-[#FFDDB8] hover:bg-[#D08B4C]/20"
-                            >
-                                Зв’язатися з відділом якості
-                            </Link>
-                        </div>
+                        {/*<div className="mt-6 flex flex-wrap gap-3">*/}
+                        {/*    <Link*/}
+                        {/*        href="/certifications"*/}
+                        {/*        className="inline-flex items-center gap-2 rounded-xl px-4 py-2 border border-white/15 text-white/90 hover:bg-white/10"*/}
+                        {/*    >*/}
+                        {/*        Сертифікації*/}
+                        {/*    </Link>*/}
+                        {/*    <Link*/}
+                        {/*        href="/contacts"*/}
+                        {/*        className="inline-flex items-center gap-2 rounded-xl px-4 py-2 border border-[#D08B4C]/70 text-[#FFDDB8] hover:bg-[#D08B4C]/20"*/}
+                        {/*    >*/}
+                        {/*        Зв’язатися з відділом якості*/}
+                        {/*    </Link>*/}
+                        {/*</div>*/}
                     </div>
 
                     <div className="md:col-span-5 space-y-4">

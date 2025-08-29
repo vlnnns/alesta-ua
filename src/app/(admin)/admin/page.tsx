@@ -17,9 +17,10 @@ export default async function AdminHome() {
     const now = new Date()
     const from7 = new Date(now); from7.setDate(from7.getDate() - 7)
 
-    const [productCount, orderCount, latestOrders, last7] = await Promise.all([
+    const [productCount, orderCount, blogCount, latestOrders, last7] = await Promise.all([
         prisma.plywoodProduct.count(),
         prisma.order.count(),
+        prisma.blogPost.count(), // ⬅️ додали блог
         prisma.order.findMany({
             orderBy: { id: 'desc' },
             select: { id: true, createdAt: true, customerName: true, total: true },
@@ -41,15 +42,13 @@ export default async function AdminHome() {
                 <header className="flex items-end justify-between gap-4">
                     <div>
                         <h1 className="text-3xl font-semibold tracking-tight">Адмін-панель</h1>
-                        <p className="mt-1 text-neutral-600">Оберіть дію: керування товарами або перегляд замовлень.</p>
+                        <p className="mt-1 text-neutral-600">Оберіть дію: керування товарами, блогом або замовленнями.</p>
                     </div>
                     <a href="/admin/logout" className="rounded-xl border px-3 py-2 text-sm">Вийти</a>
-
-
                 </header>
 
                 {/* Основні дії */}
-                <section className="grid gap-6 sm:grid-cols-2">
+                <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {/* Товари */}
                     <div className="rounded-2xl border border-neutral-200 bg-white p-6">
                         <div className="flex items-start justify-between gap-4">
@@ -58,21 +57,18 @@ export default async function AdminHome() {
                                 <p className="mt-1 text-sm text-neutral-600">Керування асортиментом, цінами, наявністю.</p>
                             </div>
                             <svg className="h-8 w-8 text-neutral-400" viewBox="0 0 24 24" fill="none">
-                                <path d="M3 7h18M3 12h18M3 17h18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                                <path d="M3 7h18M3 12h18M3 17h18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                             </svg>
                         </div>
-
                         <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
                             <div className="text-sm text-neutral-600">
                                 Всього позицій: <span className="font-medium text-neutral-900">{productCount}</span>
                             </div>
                             <div className="flex items-center gap-2">
-                                <Link href="/admin/products"
-                                      className="rounded-xl bg-[#D08B4C] px-4 py-2 text-white hover:bg-[#c57b37]">
+                                <Link href="/admin/products" className="rounded-xl bg-[#D08B4C] px-4 py-2 text-white hover:bg-[#c57b37]">
                                     Перейти до товарів
                                 </Link>
-                                <Link href="/admin/products/new"
-                                      className="rounded-xl border border-neutral-200 px-4 py-2 hover:bg-neutral-50">
+                                <Link href="/admin/products/new" className="rounded-xl border border-neutral-200 px-4 py-2 hover:bg-neutral-50">
                                     + Додати товар
                                 </Link>
                             </div>
@@ -91,28 +87,22 @@ export default async function AdminHome() {
                                 <path d="M9 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
                             </svg>
                         </div>
-
                         <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
                             <div className="text-sm text-neutral-600">
                                 Всього замовлень: <span className="font-medium text-neutral-900">{orderCount}</span>
                             </div>
                             <div className="flex items-center gap-2">
-                                <Link href="/admin/orders"
-                                      className="rounded-xl bg-[#D08B4C] px-4 py-2 text-white hover:bg-[#c57b37]">
+                                <Link href="/admin/orders" className="rounded-xl bg-[#D08B4C] px-4 py-2 text-white hover:bg-[#c57b37]">
                                     Перейти до замовлень
                                 </Link>
-                                <Link href="/admin/orders/export?range=30d"
-                                      className="rounded-xl border border-neutral-200 px-4 py-2 hover:bg-neutral-50">
+                                <Link href="/admin/orders/export?range=30d" className="rounded-xl border border-neutral-200 px-4 py-2 hover:bg-neutral-50">
                                     Експорт CSV (30 днів)
                                 </Link>
-                                <Link href="/admin/orders/export?range=7d"
-                                      className="rounded-xl border border-neutral-200 px-4 py-2 hover:bg-neutral-50">
+                                <Link href="/admin/orders/export?range=7d" className="rounded-xl border border-neutral-200 px-4 py-2 hover:bg-neutral-50">
                                     Експорт CSV (7 днів)
                                 </Link>
                             </div>
                         </div>
-
-                        {/* Метрики за 7 днів */}
                         <div className="mt-4 grid grid-cols-3 gap-3 text-center">
                             <div className="rounded-xl bg-neutral-50 p-3">
                                 <div className="text-xs text-neutral-500">Замовлень (7 днів)</div>
@@ -128,6 +118,33 @@ export default async function AdminHome() {
                             </div>
                         </div>
                     </div>
+
+                    {/* Блог */}
+                    <div className="rounded-2xl border border-neutral-200 bg-white p-6">
+                        <div className="flex items-start justify-between gap-4">
+                            <div>
+                                <h2 className="text-xl font-semibold">Блог</h2>
+                                <p className="mt-1 text-sm text-neutral-600">Статті, обкладинки, публікація, фічеринг.</p>
+                            </div>
+                            <svg className="h-8 w-8 text-neutral-400" viewBox="0 0 24 24" fill="none">
+                                <path d="M5 5h14v14H5z" stroke="currentColor" strokeWidth="1.5"/>
+                                <path d="M8 9h8M8 13h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                            </svg>
+                        </div>
+                        <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
+                            <div className="text-sm text-neutral-600">
+                                Всього постів: <span className="font-medium text-neutral-900">{blogCount}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Link href="/admin/blog" className="rounded-xl bg-[#D08B4C] px-4 py-2 text-white hover:bg-[#c57b37]">
+                                    Керувати постами
+                                </Link>
+                                <Link href="/admin/blog/new" className="rounded-xl border border-neutral-200 px-4 py-2 hover:bg-neutral-50">
+                                    + Новий пост
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
                 </section>
 
                 {/* Останні замовлення */}
@@ -136,7 +153,6 @@ export default async function AdminHome() {
                         <h3 className="text-lg font-semibold">Останні замовлення</h3>
                         <Link href="/admin/orders" className="text-[#D08B4C] text-sm hover:underline">Всі замовлення →</Link>
                     </div>
-
                     <div className="overflow-x-auto">
                         <table className="min-w-full text-sm">
                             <thead className="bg-neutral-50 text-neutral-600">

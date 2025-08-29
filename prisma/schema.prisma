@@ -13,7 +13,7 @@ model PlywoodProduct {
   type          String
   thickness     Float
   format        String
-  grade         String
+  grade         String?
   manufacturer  String
   waterproofing String
   price         Int
@@ -70,4 +70,19 @@ model OrderItem {
   order         Order   @relation(fields: [orderId], references: [id])
 
   @@map("order_items")
+}
+
+model BlogPost {
+  id          Int       @id @default(autoincrement())
+  slug        String    @unique
+  title       String
+  excerpt     String
+  bodyHtml    String
+  coverImage  String?
+  category    String?
+  featured    Boolean   @default(false)
+  published   Boolean   @default(true)
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }

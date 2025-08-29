@@ -94,6 +94,19 @@ export default function CartPageClient() {
                                     </div>
                                 </article>
                             ))}
+
+                            {/* <-- НОВЕ посилання під списком товарів */}
+                            <div className="pt-1">
+                                <Link
+                                    href="/catalog"
+                                    className="inline-flex items-center gap-2 rounded-xl border border-neutral-200 bg-white px-4 py-2 text-sm font-medium text-[#D08B4C] hover:underline"
+                                >
+                                    Додати ще товари
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+                                        <path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
+                                </Link>
+                            </div>
                         </section>
 
                         {/* Summary */}

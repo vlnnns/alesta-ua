@@ -6,7 +6,7 @@ type Catalog = {
     type: string
     thicknesses: number[]
     formats: string[]
-    grades: string[]
+    grades: string[]        // для Ламінованої та Транспортної — []
     waterproofing: string
     image: string
     priceBase: number
@@ -16,8 +16,8 @@ type Catalog = {
 const CATALOG: Catalog[] = [
     {
         type: 'ФСФ',
-        thicknesses: [4, 6, 6.5, 7, 9, 9.5, 10, 12, 15, 18, 21, 24, 27, 30, 35, 40],
-        formats: ['2500x1250', '3000x1500'],
+        thicknesses: [4,6,6.5,7,9,9.5,10,12,15,18,21,24,27,30,35,40],
+        formats: ['2500x1250','3000x1500'],
         grades: ['B/BB (1/2)','BB/BB (2/2)','BB/C (2/4)','BB/CP (2/3)','C/C (4/4)','CP/C (3/4)','CP/CP (3/3)'],
         waterproofing: 'Підвищена',
         image: '/plywood/fsf.png',
@@ -48,7 +48,7 @@ const CATALOG: Catalog[] = [
         type: 'Ламінована',
         thicknesses: [6,6.5,9,9.5,12,15,18,21,24,27,30,35,40],
         formats: ['2500x1250','3000x1500'],
-        grades: ['гладка/гладка (F/F)','гладка/сітка (F/W)'],
+        grades: [], // без сорту
         waterproofing: 'Водостійка',
         image: '/plywood/laminated.png',
         priceBase: 2500,
@@ -68,7 +68,7 @@ const CATALOG: Catalog[] = [
         type: 'Транспортна',
         thicknesses: [12,15,18,21,24,27,30,35,40],
         formats: ['2500x1250','3000x1500'],
-        grades: ['гладка/сітка (F/W)'],
+        grades: [], // без сорту
         waterproofing: 'Водостійка',
         image: '/plywood/transport.png',
         priceBase: 2700,
@@ -90,16 +90,18 @@ const CATALOG: Catalog[] = [
 const priceFor = (cfg: Catalog, t: number, f: string) =>
     Math.round((cfg.priceBase + cfg.pricePerMm * t) * (f === '3000x1500' ? 1.15 : 1))
 
+// генератор: БЕЗ null — підставляємо '' коли сорту немає
 function* generateAll(): Generator<Prisma.PlywoodProductCreateManyInput> {
     for (const cfg of CATALOG) {
         for (const t of cfg.thicknesses) {
             for (const f of cfg.formats) {
-                for (const g of cfg.grades) {
+                const grades: string[] = cfg.grades.length > 0 ? cfg.grades : [''] // ← тільки string
+                for (const g of grades) {
                     yield {
                         type: cfg.type,
                         thickness: t,
                         format: f,
-                        grade: g,
+                        grade: g, // '' для ламінованої/транспортної
                         manufacturer: 'Україна',
                         waterproofing: cfg.waterproofing,
                         price: priceFor(cfg, t, f),
@@ -113,7 +115,7 @@ function* generateAll(): Generator<Prisma.PlywoodProductCreateManyInput> {
 }
 
 async function main() {
-    // 0) Нормалізація: прибираємо всі записи, де виробник != "Україна"
+    // 0) Чистимо записи з неправильним виробником
     const toDelete = await prisma.plywoodProduct.count({
         where: { manufacturer: { notIn: ['Україна'] } },
     })
@@ -124,7 +126,7 @@ async function main() {
     }
     console.log(`🧹 Видалено записів з чужим виробником: ${toDelete}`)
 
-    // 1) Перейменування старих назв
+    // 1) Перейменування, якщо лишилися старі назви
     const rename: Record<string, string> = {
         'Фанера для Лазера': 'Для Лазера',
         'Фанера Транспортна': 'Транспортна',
@@ -135,15 +137,22 @@ async function main() {
         if (res.count > 0) console.log(`✏️ Перейменовано "${from}" → "${to}": ${res.count}`)
     }
 
-    // 2) Upsert усіх комбінацій
+    // 2) Жорстко видаляємо ВСІ старі Ламіновані та Транспортні (з будь-яким grade)
+    const wiped = await prisma.plywoodProduct.deleteMany({
+        where: { type: { in: ['Ламінована', 'Транспортна'] } },
+    })
+    console.log(`🗑️ Видалено Ламінована/Транспортна: ${wiped.count}`)
+
+    // 3) Upsert усіх комбінацій
     let created = 0, updated = 0
     for (const d of generateAll()) {
+        // Унікальний пошук (grade тепер завжди string)
         const existing = await prisma.plywoodProduct.findFirst({
             where: {
                 type: d.type,
                 thickness: d.thickness,
                 format: d.format,
-                grade: d.grade,
+                grade: d.grade,                // '' для безсортових
                 manufacturer: d.manufacturer,
             },
             select: { id: true },

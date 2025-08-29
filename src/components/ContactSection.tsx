@@ -1,6 +1,7 @@
 // components/ContactSection.tsx
 'use client'
 
+import { useMemo } from 'react'
 import { Mail, Phone, MapPin } from 'lucide-react'
 
 type Props = {
@@ -27,21 +28,30 @@ const shineSpan =
     'transition-transform duration-700 ease-out'
 
 export default function ContactSection({
-                                           titleLeft = "ЗВ’ЯЖІТЬСЯ",
+                                           titleLeft = 'ЗВ’ЯЖІТЬСЯ',
                                            titleRight = 'З НАМИ',
                                            description = 'Маєте запитання, бажаєте уточнити деталі замовлення чи отримати консультацію щодо підбору фанери? Ми завжди на зв’язку та раді допомогти!',
-                                           email = 'info@alestaua.com',
-                                           phone = '+38 (067) 767 7077',
-                                           address = ' Vul. Dmytra Vitovsʹkoho,Halych, Ivano-Frankivs\'ka oblast, Ukrayna, Галич, Івано-Франківська область, 77100',
+                                           email = 'alesta.ply@gmail.com',
+                                           phone = '+38 (066) 987 91 16',
+                                           address = 'Івано-Франківська обл, Угринів, калуське шосе 2 3/1',
                                            id = 'contacts',
                                            className = '',
                                        }: Props) {
+    const mapSrc = useMemo(
+        () => `https://www.google.com/maps?q=${encodeURIComponent(address)}&output=embed`,
+        [address]
+    )
+
+    const mapsLink = useMemo(
+        () => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`,
+        [address]
+    )
+
     return (
         <section
             id={id}
             className={`relative px-4 sm:px-6 py-12 bg-[#151515] text-white ${className} overflow-hidden`}
         >
-
             <div className="relative mx-auto max-w-7xl grid items-start gap-10 lg:gap-16 grid-cols-1 lg:grid-cols-2">
                 {/* Left: heading + text */}
                 <div>
@@ -54,16 +64,15 @@ export default function ContactSection({
                     </p>
                 </div>
 
-                {/* Right: contact cards (dark glass) */}
+                {/* Right: cards + map */}
                 <ul className="space-y-5">
-                    {/* Email */}
                     {/* Email */}
                     <li>
                         <a href={`mailto:${email}`} className={cardBase}>
                             <span aria-hidden className={shineSpan} />
                             <span className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-xl bg-white/10 border border-white/15 text-[#D08B4C]">
-      <Mail className="w-6 h-6" />
-    </span>
+                <Mail className="w-6 h-6" />
+              </span>
                             <div className="min-w-0">
                                 <div className="text-white font-semibold">Email</div>
                                 <div className="truncate underline decoration-[#D08B4C]/30 underline-offset-2 transition-colors group-hover:text-[#D08B4C]">
@@ -78,8 +87,8 @@ export default function ContactSection({
                         <a href={`tel:${phone.replace(/[^\d+]/g, '')}`} className={cardBase}>
                             <span aria-hidden className={shineSpan} />
                             <span className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-xl bg-white/10 border border-white/15 text-[#D08B4C]">
-      <Phone className="w-6 h-6" />
-    </span>
+                <Phone className="w-6 h-6" />
+              </span>
                             <div className="min-w-0">
                                 <div className="text-white font-semibold">Phone</div>
                                 <div className="truncate underline decoration-[#D08B4C]/30 underline-offset-2 transition-colors group-hover:text-[#D08B4C]">
@@ -91,20 +100,39 @@ export default function ContactSection({
 
                     {/* Address */}
                     <li>
-                        <button type="button" className={`${cardBase} cursor-pointer w-full text-left`}>
+                        <div className={`${cardBase} w-full text-left cursor-default`}>
                             <span aria-hidden className={shineSpan} />
                             <span className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-xl bg-white/10 border border-white/15 text-[#D08B4C]">
-      <MapPin className="w-6 h-6" />
-    </span>
+                <MapPin className="w-6 h-6" />
+              </span>
                             <div className="min-w-0">
                                 <div className="text-white font-semibold">Office</div>
-                                <div className="text-white/80 transition-colors group-hover:text-[#D08B4C]">
-                                    {address}
-                                </div>
+                                <div className="text-white/80">{address}</div>
                             </div>
-                        </button>
-                    </li>
+                        </div>
 
+                        {/* Google Map under the address */}
+                        <div className="mt-3 overflow-hidden rounded-2xl border border-white/10 bg-white/5">
+                            <iframe
+                                title="Google Map"
+                                src={mapSrc}
+                                loading="lazy"
+                                referrerPolicy="no-referrer-when-downgrade"
+                                className="w-full h-[260px] sm:h-[320px]"
+                                allowFullScreen
+                            />
+                            <div className="px-4 py-2 text-xs text-white/70">
+                                <a
+                                    href={mapsLink}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="underline decoration-[#D08B4C]/40 hover:text-[#D08B4C]"
+                                >
+                                    Відкрити на Google Maps
+                                </a>
+                            </div>
+                        </div>
+                    </li>
                 </ul>
             </div>
         </section>

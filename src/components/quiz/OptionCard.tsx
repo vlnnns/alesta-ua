@@ -19,9 +19,9 @@ export default function OptionCard({ option, isActive, onToggle }: Props) {
             role="checkbox"
             aria-checked={isActive}
             className={`
-        group relative text-left rounded-md border overflow-hidden
+        group relative w-full text-left rounded-md border overflow-hidden
         transition-all duration-200 focus:outline-none bg-white
-        min-w-[170px] max-w-[170px] aspect-[5/4]
+        aspect-[5/4]
         ${isActive
                 ? 'border-[#D08B4C] ring-2 ring-[#D08B4C]/30 bg-[#FFF9F3]'
                 : 'border-neutral-200 hover:border-neutral-300 focus:ring-2 focus:ring-neutral-300/70'}
@@ -33,8 +33,7 @@ export default function OptionCard({ option, isActive, onToggle }: Props) {
                         вибрано
                     </div>
                 )}
-                {/* за бажанням можна вивести зображення:
-        {img && <img src={img} alt="" className="w-full h-20 object-cover" />} */}
+                {/* {img && <img src={img} alt="" className="w-full h-20 object-cover" />} */}
             </div>
 
             <div className="h-[100%] grid content-center text-center px-2">

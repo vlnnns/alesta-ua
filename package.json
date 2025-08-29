@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "seed": "tsx prisma/seed.ts",
+    "seed-blog": "tsx prisma/seed-blog.ts",
     "vercel-build": "prisma generate && next build"
   },
   "dependencies": {

@@ -5,7 +5,13 @@ import type { PlywoodProduct } from '@prisma/client'
 import ProductCard, { type ProductCardOptions } from '@/components/product/ProductCard'
 import { useCart } from '@/components/cart/CartProvider'
 
-export default function CatalogProductGrid({ items }: { items: PlywoodProduct[] }) {
+export default function CatalogProductGrid({
+                                               items,
+                                               mobile = 'full', // 'full' | 'center'
+                                           }: {
+    items: PlywoodProduct[]
+    mobile?: 'full' | 'center'
+}) {
     const [expanded, setExpanded] = useState<Record<number, boolean>>({})
     const { addItem, open } = useCart()
 
@@ -24,13 +30,8 @@ export default function CatalogProductGrid({ items }: { items: PlywoodProduct[] 
     }, [items])
 
     const handleSubmit = (payload: {
-        id: number
-        type: string
-        thickness: number
-        format: string
-        grade: string
-        manufacturer: string
-        waterproofing: string
+        id: number; type: string; thickness: number; format: string;
+        grade: string; manufacturer: string; waterproofing: string
     }) => {
         const source = items.find(it => it.id === payload.id)
         if (!source) return
@@ -51,19 +52,41 @@ export default function CatalogProductGrid({ items }: { items: PlywoodProduct[] 
         open()
     }
 
+    // 🔹 сортируем: в наличии (inStock !== false) -> вверх; нет в наличии -> вниз
+    const sortedItems = useMemo(() => {
+        return items
+            .map((p, idx) => ({ p, idx }))
+            .sort((a, b) => {
+                const aOut = a.p.inStock === false ? 1 : 0
+                const bOut = b.p.inStock === false ? 1 : 0
+                if (aOut !== bOut) return aOut - bOut           // 0 перед 1
+                return a.idx - b.idx                             // стабильный порядок внутри групп
+            })
+            .map(x => x.p)
+    }, [items])
+
+    // обёртка для карточки на мобайле:
+    const wrapClass = mobile === 'center'
+        ? 'w-full max-w-[420px] mx-auto'
+        : 'w-full'
+
     return (
-        <div className="flex flex-wrap gap-6 items-stretch">
-            {items.map((p) => (
-                <ProductCard
-                    key={p.id}
-                    product={p}
-                    isOpen={!!expanded[p.id]}
-                    onToggle={() => toggle(p.id)}   // кнопка “+” открывает редактирование
-                    options={options}
-                    onSubmit={handleSubmit}         // ✔ добавляет в корзину
-                    fixedHeight={420}
-                    className="basis-[280px] grow-0 shrink-0"
-                />
+        <div className="
+      grid gap-4 sm:gap-6
+      grid-cols-1 md:grid-cols-2 lg:grid-cols-3
+      justify-items-stretch
+    ">
+            {sortedItems.map(p => (
+                <div key={p.id} className={wrapClass}>
+                    <ProductCard
+                        product={p}
+                        isOpen={!!expanded[p.id]}
+                        onToggle={() => toggle(p.id)}
+                        options={options}
+                        onSubmit={handleSubmit}
+                        className="w-full"
+                    />
+                </div>
             ))}
         </div>
     )
