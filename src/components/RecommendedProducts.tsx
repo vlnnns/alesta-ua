@@ -8,59 +8,76 @@ import { useCart } from '@/components/cart/CartProvider'
 import useEmblaCarousel from 'embla-carousel-react'
 import { IoChevronBack, IoChevronForward } from 'react-icons/io5'
 
-const BRAND = '#D08B4C'
-const MAX = 4
+/** Constants */
+const BRAND_COLOR = '#D08B4C'
+const MAX_ITEMS = 4
 
-type Expanded = Record<number, boolean>
+/** Helpers */
+const uniq = <T,>(arr: (T | null | undefined)[]): T[] =>
+    [...new Set(arr.filter((x): x is T => x != null))]
+
+type ExpandedMap = Record<number, boolean>
 
 export default function RecommendedProducts() {
     const [products, setProducts] = useState<PlywoodProduct[]>([])
-    const [expanded, setExpanded] = useState<Expanded>({})
+    const [expanded, setExpanded] = useState<ExpandedMap>({})
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
 
     const { addItem, open } = useCart()
 
+    /** Fetch recommendations */
     useEffect(() => {
         const ac = new AbortController()
         ;(async () => {
             try {
                 setLoading(true)
                 setError(null)
-                // просим у API максимум 6
-                const res = await fetch(`/api/recommend?limit=${MAX}`, { cache: 'no-store', signal: ac.signal })
+
+                const res = await fetch(`/api/recommend?limit=${MAX_ITEMS}`, {
+                    cache: 'no-store',
+                    signal: ac.signal,
+                })
                 if (!res.ok) throw new Error(`HTTP ${res.status}`)
-                const data = await res.json()
-                // и всё равно режем на клиенте до 6
+
+                const data: unknown = await res.json()
                 const list = Array.isArray(data) ? (data as PlywoodProduct[]) : []
-                setProducts(list.slice(0, MAX))
-            } catch (e: unknown) {
-                const aborted = e instanceof DOMException && e.name === 'AbortError'
-                if (!aborted) setError('Не вдалося завантажити рекомендації')
+                setProducts(list.slice(0, MAX_ITEMS))
+            } catch (err) {
+                if (!(err instanceof DOMException && err.name === 'AbortError')) {
+                    console.error('[RecommendedProducts] fetch error', err)
+                    setError('Не вдалося завантажити рекомендації')
+                }
             } finally {
                 setLoading(false)
             }
         })()
+
         return () => ac.abort()
     }, [])
 
-    // используем именно "видимые" элементы (у нас и так уже 0..6)
-    const items = useMemo(() => products.slice(0, MAX), [products])
+    /** Use only first MAX_ITEMS */
+    const items = useMemo(() => products.slice(0, MAX_ITEMS), [products])
 
-    const toggle = (id: number) => setExpanded(prev => ({ ...prev, [id]: !prev[id] }))
+    /** Expand / collapse product details */
+    const toggle = (id: number) =>
+        setExpanded((prev) => ({ ...prev, [id]: !prev[id] }))
 
+    /** Extract options for product variations */
     const options: ProductCardOptions = useMemo(() => {
-        const uniq = <T,>(arr: T[]) => [...new Set(arr.filter(Boolean) as T[])]
         return {
-            types:          uniq(items.map(p => p.type)),
-            thicknesses:    uniq(items.map(p => p.thickness)).sort((a,b)=>Number(a)-Number(b)),
-            formats:        uniq(items.map(p => p.format)),
-            grades:         uniq(items.map(p => p.grade)),
-            manufacturers:  uniq(items.map(p => p.manufacturer)),
-            waterproofings: uniq(items.map(p => p.waterproofing)),
+            types: uniq(items.map((p) => p.type)),
+            thicknesses: uniq(items.map((p) => p.thickness)).sort(
+                (a, b) => Number(a) - Number(b)
+            ),
+            formats: uniq(items.map((p) => p.format)),
+            grades: uniq(items.map((p) => p.grade)),
+            manufacturers: uniq(items.map((p) => p.manufacturer)),
+            waterproofings: uniq(items.map((p) => p.waterproofing)),
         }
     }, [items])
 
+    /** Add to cart handler */
     const handleSubmit = (payload: {
         id: number
         type: string
@@ -70,12 +87,13 @@ export default function RecommendedProducts() {
         manufacturer: string
         waterproofing: string
     }) => {
-        const p = items.find(x => x.id === payload.id)
-        if (!p) return
+        const product = items.find((x) => x.id === payload.id)
+        if (!product) return
+
         addItem({
-            productId: p.id,
-            image: p.image ?? '',
-            price: p.price,
+            productId: product.id,
+            image: product.image ?? '',
+            price: product.price,
             type: payload.type,
             thickness: payload.thickness,
             format: payload.format,
@@ -85,11 +103,12 @@ export default function RecommendedProducts() {
             quantity: 1,
             title: `Фанера ${payload.type} ${payload.thickness} мм`,
         })
+
         open()
-        setExpanded(prev => ({ ...prev, [payload.id]: false }))
+        setExpanded((prev) => ({ ...prev, [payload.id]: false }))
     }
 
-    // Embla (мобільна)
+    /** Embla carousel setup (mobile) */
     const [emblaRef, emblaApi] = useEmblaCarousel({
         loop: false,
         align: 'start',
@@ -99,16 +118,19 @@ export default function RecommendedProducts() {
 
     const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi])
     const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi])
-    const scrollTo   = useCallback((i: number) => emblaApi?.scrollTo(i), [emblaApi])
+    const scrollTo = useCallback((i: number) => emblaApi?.scrollTo(i), [emblaApi])
 
     const [selectedIndex, setSelectedIndex] = useState(0)
     const [snapCount, setSnapCount] = useState(0)
 
     useEffect(() => {
         if (!emblaApi) return
+
         const onSelect = () => setSelectedIndex(emblaApi.selectedScrollSnap())
+
         setSnapCount(emblaApi.scrollSnapList().length)
         onSelect()
+
         emblaApi.on('select', onSelect)
         emblaApi.on('reInit', () => {
             setSnapCount(emblaApi.scrollSnapList().length)
@@ -116,10 +138,20 @@ export default function RecommendedProducts() {
         })
     }, [emblaApi])
 
+    /** Render */
     return (
-        <section className="bg-[#202020] bg-cover bg-center py-16 px-6 text-white">
-            <div className="max-w-7xl mx-auto">
-                <h2 className="text-3xl font-bold mb-10">Рекомендовані товари</h2>
+        <section className="relative py-16 px-6 text-white">
+            {/* Background image */}
+            <div className="absolute inset-0 -z-10">
+                <img
+                    src="/recommended-bg.png" // 👉 положи картинку в /public/recommended-bg.jpg
+                    alt="Background"
+                    className="h-full w-full object-cover"
+                />
+            </div>
+
+            <div className="mx-auto max-w-7xl relative z-10">
+                <h2 className="mb-10 text-3xl font-bold">Рекомендовані товари</h2>
 
                 {loading ? (
                     <p className="text-white/70">Завантаження…</p>
@@ -129,7 +161,7 @@ export default function RecommendedProducts() {
                     <p className="text-white/70">Поки немає рекомендацій.</p>
                 ) : (
                     <>
-                        {/* 🔹 Мобільна карусель */}
+                        {/* 🔹 Mobile carousel */}
                         <div className="md:hidden">
                             <div className="overflow-hidden px-1" ref={emblaRef}>
                                 <div className="flex gap-4">
@@ -149,12 +181,12 @@ export default function RecommendedProducts() {
                                 </div>
                             </div>
 
-                            {/* навигация */}
+                            {/* Navigation */}
                             <div className="mt-5 flex items-center justify-start gap-5">
                                 <button
                                     onClick={scrollPrev}
-                                    className="w-8 h-8 rounded-full flex items-center justify-center shadow-md active:scale-95"
-                                    style={{ backgroundColor: BRAND, color: 'white' }}
+                                    className="flex h-8 w-8 items-center justify-center rounded-full shadow-md active:scale-95"
+                                    style={{ backgroundColor: BRAND_COLOR }}
                                     aria-label="Попередній"
                                 >
                                     <IoChevronBack size={20} />
@@ -168,8 +200,10 @@ export default function RecommendedProducts() {
                                             aria-label={`Слайд ${i + 1}`}
                                             className="h-1.5 w-1.5 rounded-full transition-[transform,background-color]"
                                             style={{
-                                                backgroundColor: i === selectedIndex ? BRAND : '#E5E7EB',
-                                                transform: i === selectedIndex ? 'scale(1.1)' : 'scale(1)',
+                                                backgroundColor:
+                                                    i === selectedIndex ? BRAND_COLOR : '#E5E7EB',
+                                                transform:
+                                                    i === selectedIndex ? 'scale(1.1)' : 'scale(1)',
                                             }}
                                         />
                                     ))}
@@ -177,8 +211,8 @@ export default function RecommendedProducts() {
 
                                 <button
                                     onClick={scrollNext}
-                                    className="w-8 h-8 rounded-full flex items-center justify-center shadow-md active:scale-95"
-                                    style={{ backgroundColor: BRAND, color: 'white' }}
+                                    className="flex h-8 w-8 items-center justify-center rounded-full shadow-md active:scale-95"
+                                    style={{ backgroundColor: BRAND_COLOR }}
                                     aria-label="Наступний"
                                 >
                                     <IoChevronForward size={20} />
@@ -186,9 +220,9 @@ export default function RecommendedProducts() {
                             </div>
                         </div>
 
-                        {/* 🔹 Десктоп/планшет */}
+                        {/* 🔹 Desktop / tablet grid */}
                         <div className="hidden md:grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            {items.map(p => (
+                            {items.map((p) => (
                                 <ProductCard
                                     key={p.id}
                                     product={p}

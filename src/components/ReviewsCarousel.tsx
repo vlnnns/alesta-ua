@@ -104,7 +104,7 @@ export default function ReviewsCarousel() {
                                     key={i}
                                     onClick={() => scrollTo(i)}
                                     aria-label={`Слайд ${i + 1}`}
-                                    className="h-1.5 w-1.5 rounded-full transition-[transform,background-color]"
+                                    className="bg-gray-100 h-1.5 w-1.5 rounded-full transition-[transform,background-color]"
                                     style={{
                                         backgroundColor: i === selectedIndex ? BRAND : '#E5E7EB',
                                         transform: i === selectedIndex ? 'scale(1.1)' : 'scale(1)',
