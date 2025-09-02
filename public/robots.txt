@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /checkout
+Disallow: /cart
+Allow: /
+
+Sitemap: https://alesta.org.ua/sitemap.xml

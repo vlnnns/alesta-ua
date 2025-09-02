@@ -1,10 +1,14 @@
 'use client'
 
+import { useState } from 'react'
+import Image from 'next/image'
 import { HiOutlineArrowRight } from 'react-icons/hi'
 
-const NAV_OFFSET = 80; // висота вашого фіксованого хедера, підкоригуй за потреби
+const NAV_OFFSET = 80
 
 export default function Hero() {
+    const [loaded, setLoaded] = useState(false)
+
     const scrollToQuiz = () => {
         const el = document.getElementById('quiz')
         if (!el) return
@@ -13,26 +17,51 @@ export default function Hero() {
     }
 
     return (
-        <section className="h-screen w-full relative flex items-center justify-center text-white">
+        <section className="relative flex h-screen w-full items-center justify-center text-white bg-black">
+            {/* Фоновая картинка + плавное появление */}
             <div className="absolute inset-0 z-0">
-                <img
-                    src="/hero.png"
+                {/* Фолбек-слой, пока загружается изображение */}
+                <div
+                    className={`absolute inset-0 transition-opacity duration-500 ${
+                        loaded ? 'opacity-0' : 'opacity-100'
+                    }`}
+                    aria-hidden
+                    // мягкий градиент/шум — чтобы не было чёрного провала
+                    style={{
+                        background:
+                            'radial-gradient(80% 60% at 50% 40%, rgba(255,255,255,0.06), rgba(0,0,0,0.6))',
+                    }}
+                />
+                <Image
+                    src="/hero.png"            // Убедись, что файл лежит в /public/hero.png
                     alt="Фанера"
-                    className="object-cover w-full h-full brightness-[0.45]"
+                    fill                        // заполняет весь контейнер
+                    priority                    // грузится сразу
+                    sizes="100vw"
+                    onLoadingComplete={() => setLoaded(true)}
+                    onError={() => {
+                        // чтобы не оставался черный экран, если файла нет
+                        setLoaded(true)
+                        console.error('Не удалось загрузить /hero.png — проверь, что файл в /public')
+                    }}
+                    className={`object-cover brightness-[0.45] transition-opacity duration-1000 ease-out ${
+                        loaded ? 'opacity-100' : 'opacity-0'
+                    }`}
                 />
             </div>
 
-            <div className="relative z-10 text-center px-6">
-                <h1 className="text-4xl md:text-6xl font-bold mb-4">ФАНЕРА В РОЗДРІБ / ОПТ</h1>
-                <p className="max-w-xl mx-auto text-sm md:text-lg mb-8">
-                    Ми створюємо якісний матеріал, а у ваших руках і завдяки вашій фантазії вона перетворюється на справжні шедеври.
+            {/* Контент */}
+            <div className="relative z-10 px-6 text-center">
+                <h1 className="mb-4 text-4xl font-bold md:text-6xl">ФАНЕРА В РОЗДРІБ / ОПТ</h1>
+                <p className="mx-auto mb-8 max-w-xl text-sm md:text-lg">
+                    Ми створюємо якісний матеріал, а у ваших руках і завдяки вашій фантазії вона
+                    перетворюється на справжні шедеври.
                 </p>
-
                 <button
                     onClick={scrollToQuiz}
-                    className="inline-flex items-center bg-[#D08B4C] hover:bg-[#c07c3c] transition text-white px-6 py-3 rounded-md text-sm font-semibold"
+                    className="inline-flex items-center rounded-md bg-[#D08B4C] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#c07c3c]"
                 >
-                    <span className="pr-4 border-r border-white/60">ПОЧАТИ ПІДБІР ТОВАРУ</span>
+                    <span className="border-r border-white/60 pr-4">ПОЧАТИ ПІДБІР ТОВАРУ</span>
                     <HiOutlineArrowRight className="ml-4 text-xl" />
                 </button>
             </div>

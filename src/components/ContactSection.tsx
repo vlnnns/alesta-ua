@@ -1,7 +1,6 @@
 // components/ContactSection.tsx
 'use client'
 
-import { useMemo } from 'react'
 import { Mail, Phone, MapPin } from 'lucide-react'
 
 type Props = {
@@ -37,16 +36,6 @@ export default function ContactSection({
                                            id = 'contacts',
                                            className = '',
                                        }: Props) {
-    const mapSrc = useMemo(
-        () => `https://www.google.com/maps?q=${encodeURIComponent(address)}&output=embed`,
-        [address]
-    )
-
-    const mapsLink = useMemo(
-        () => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`,
-        [address]
-    )
-
     return (
         <section
             id={id}
@@ -71,8 +60,8 @@ export default function ContactSection({
                         <a href={`mailto:${email}`} className={cardBase}>
                             <span aria-hidden className={shineSpan} />
                             <span className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-xl bg-white/10 border border-white/15 text-[#D08B4C]">
-                <Mail className="w-6 h-6" />
-              </span>
+                                <Mail className="w-6 h-6" />
+                            </span>
                             <div className="min-w-0">
                                 <div className="text-white font-semibold">Email</div>
                                 <div className="truncate underline decoration-[#D08B4C]/30 underline-offset-2 transition-colors group-hover:text-[#D08B4C]">
@@ -87,8 +76,8 @@ export default function ContactSection({
                         <a href={`tel:${phone.replace(/[^\d+]/g, '')}`} className={cardBase}>
                             <span aria-hidden className={shineSpan} />
                             <span className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-xl bg-white/10 border border-white/15 text-[#D08B4C]">
-                <Phone className="w-6 h-6" />
-              </span>
+                                <Phone className="w-6 h-6" />
+                            </span>
                             <div className="min-w-0">
                                 <div className="text-white font-semibold">Phone</div>
                                 <div className="truncate underline decoration-[#D08B4C]/30 underline-offset-2 transition-colors group-hover:text-[#D08B4C]">
@@ -103,27 +92,29 @@ export default function ContactSection({
                         <div className={`${cardBase} w-full text-left cursor-default`}>
                             <span aria-hidden className={shineSpan} />
                             <span className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-xl bg-white/10 border border-white/15 text-[#D08B4C]">
-                <MapPin className="w-6 h-6" />
-              </span>
+                                <MapPin className="w-6 h-6" />
+                            </span>
                             <div className="min-w-0">
                                 <div className="text-white font-semibold">Office</div>
                                 <div className="text-white/80">{address}</div>
                             </div>
                         </div>
 
-                        {/* Google Map under the address */}
+                        {/* Fixed Google Map iframe */}
                         <div className="mt-3 overflow-hidden rounded-2xl border border-white/10 bg-white/5">
                             <iframe
-                                title="Google Map"
-                                src={mapSrc}
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2620.0157689735734!2d24.6784508!3d48.9531856!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4730c1544af6057b%3A0xe401c534f34ac118!2sAlesta!5e0!3m2!1sen!2sua!4v1756797133096!5m2!1sen!2sua"
+                                width="600"
+                                height="450"
+                                style={{ border: 0 }}
+                                allowFullScreen
                                 loading="lazy"
                                 referrerPolicy="no-referrer-when-downgrade"
                                 className="w-full h-[260px] sm:h-[320px]"
-                                allowFullScreen
                             />
                             <div className="px-4 py-2 text-xs text-white/70">
                                 <a
-                                    href={mapsLink}
+                                    href="https://goo.gl/maps/UeX9oTSSX7k3yqup6"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="underline decoration-[#D08B4C]/40 hover:text-[#D08B4C]"

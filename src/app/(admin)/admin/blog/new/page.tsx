@@ -35,7 +35,7 @@ export default function NewPostPage() {
     return (
         <main className="px-4 sm:px-6 py-10 bg-neutral-50 text-neutral-900">
             <div className="mx-auto max-w-3xl">
-                <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Адмінка', href: '/admin/blog' }, { label: 'Блог', href: '/blog' }, { label: 'Новий пост'}]} />
+                <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Адмінка', href: '/admin/blog' }, { label: 'Новий пост'}]} />
 
                 <h1 className="text-2xl font-semibold mb-6">Новий пост</h1>
                 <AdminPostForm action={action} submitLabel="Створити" />
