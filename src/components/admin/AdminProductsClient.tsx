@@ -3,9 +3,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import Breadcrumbs from '@/components/common/Breadcrumbs'
-import { useEffect, useMemo, useState, type ReactElement, Suspense } from 'react'
+import { useEffect, useMemo, useState, type ReactElement, useCallback, Suspense } from 'react'
 import { useSearchParams, usePathname, useRouter } from 'next/navigation'
-
 
 /* ---------- Types ---------- */
 type Product = {
@@ -40,30 +39,8 @@ const isDefined = <T,>(v: T | null | undefined): v is T => v !== null && v !== u
 const isNonEmptyString = (v: unknown): v is string => typeof v === 'string' && v.trim().length > 0
 const normalizeType = (s: string | null | undefined) =>
     (s ?? '').replace(/^Фанера\s+/i, '').trim().replace(/\s+/g, ' ')
-
 type Option = { v: string; t: string }
-const isOption = (o: unknown): o is Option =>
-    typeof o === 'object' && o !== null && 'v' in o && 't' in o
-
-/* ---------- Suspense helper for ?edit=ID ---------- */
-function EditOpener({
-                        items,
-                        onOpen,
-                    }: {
-    items: Product[]
-    onOpen: (p: Product) => void
-}) {
-    const search = useSearchParams()
-    useEffect(() => {
-        const qId = search.get('edit')
-        if (!qId) return
-        const pid = Number(qId)
-        if (!Number.isFinite(pid) || !items.length) return
-        const p = items.find(x => x.id === pid)
-        if (p) onOpen(p)
-    }, [search, items, onOpen])
-    return null
-}
+const isOption = (o: unknown): o is Option => typeof o === 'object' && o !== null && 'v' in o && 't' in o
 
 /* ---------- Component ---------- */
 export default function AdminProductsClient(): ReactElement {
@@ -97,18 +74,43 @@ export default function AdminProductsClient(): ReactElement {
     const pathname = usePathname()
     const router = useRouter()
 
-    const closeEdit = () => {
-        setEditing(null)
+    /* ---- URL → editing (єдине джерело правди) ---- */
+    useEffect(() => {
+        const qId = search.get('edit')
+        if (!qId) {
+            setEditing(null)
+            return
+        }
+        const pid = Number(qId)
+        if (!Number.isFinite(pid) || !items.length) return
+        const p = items.find(x => x.id === pid) ?? null
+        setEditing(p)
+    }, [search, items])
+
+    /* ---- open / close ---- */
+    const openEdit = useCallback(
+        (p: Product) => {
+            const params = new URLSearchParams(search.toString())
+            params.set('edit', String(p.id))
+            router.replace(`${pathname}?${params}`, { scroll: false })
+            // setEditing не обов'язковий — ефект вище підтягне стан з URL
+        },
+        [router, pathname, search],
+    )
+
+    const closeEdit = useCallback(() => {
         const params = new URLSearchParams(search.toString())
         params.delete('edit')
         router.replace(`${pathname}${params.size ? `?${params}` : ''}`, { scroll: false })
-    }
+        // setEditing(null) не обов'язковий
+    }, [router, pathname, search])
+
+    // Escape
     useEffect(() => {
-        if (!editing) return
         const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') closeEdit() }
         window.addEventListener('keydown', onKey)
         return () => window.removeEventListener('keydown', onKey)
-    }, [editing, closeEdit])
+    }, [closeEdit])
 
     /* ---- Load meta ---- */
     useEffect(() => {
@@ -119,13 +121,9 @@ export default function AdminProductsClient(): ReactElement {
                 if (!r.ok) return
                 const m = (await r.json()) as Meta
                 if (!ignore) setMeta(m)
-            } catch {
-                /* noop */
-            }
+            } catch { /* noop */ }
         })()
-        return () => {
-            ignore = true
-        }
+        return () => { ignore = true }
     }, [])
 
     /* ---- Load ALL products (no pagination) ---- */
@@ -333,7 +331,7 @@ export default function AdminProductsClient(): ReactElement {
             })
             if (!res.ok) throw new Error(await res.text())
             setItems(prev => prev.map(x => (x.id === editing.id ? ({ ...x, ...payload } as Product) : x)))
-            setEditing(null)
+            closeEdit()
         } catch (err) {
             console.error(err)
             setFormErr('Не вдалося зберегти зміни')
@@ -345,10 +343,8 @@ export default function AdminProductsClient(): ReactElement {
     /* ---------- Render ---------- */
     return (
         <main className="px-4 sm:px-6 py-10 bg-neutral-50 text-neutral-900">
-            {/* Suspense + EditOpener для ?edit=ID */}
-            <Suspense fallback={null}>
-                <EditOpener items={items} onOpen={(p) => setEditing(p)} />
-            </Suspense>
+            {/* Suspense лишається, але EditOpener видалено */}
+            <Suspense fallback={null} />
 
             <div className="max-w-6xl mx-auto">
                 <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Адмінка', href: '/admin' }, { label: 'Товари' }]} />
@@ -525,7 +521,7 @@ export default function AdminProductsClient(): ReactElement {
                                                     <div className="px-3 pb-3 flex items-center justify-between mt-auto">
                                                         <div className="text-lg font-semibold">₴{p.price.toLocaleString('uk-UA')}</div>
                                                         <div className="space-x-2">
-                                                            <button onClick={() => setEditing(p)} className="px-3 py-1 rounded-lg border border-neutral-200 hover:bg-neutral-50 text-sm">
+                                                            <button onClick={() => openEdit(p)} className="px-3 py-1 rounded-lg border border-neutral-200 hover:bg-neutral-50 text-sm">
                                                                 Редагувати
                                                             </button>
                                                             <button
@@ -566,14 +562,14 @@ export default function AdminProductsClient(): ReactElement {
 
             {/* Edit modal */}
             {editing && (
-                <div className="fixed inset-0 z-50" onMouseDown={closeEdit}>
-                    {/* Подложка ловит клик мыши и закрывает */}
-                    <div className="absolute inset-0 bg-black/40" />
+                <div className="fixed inset-0 z-50">
+                    {/* Бекдроп: один клік закриває */}
+                    <div className="absolute inset-0 bg-black/40" onClick={closeEdit} />
 
-                    {/* Панель модалки: стопаем событие, чтобы клик внутри НЕ закрывал */}
+                    {/* Панель: блокуємо клік всередині */}
                     <div
                         className="absolute right-0 top-0 h-full w-[560px] max-w-[100vw] bg-white shadow-2xl p-6 overflow-y-auto"
-                        onMouseDown={(e) => e.stopPropagation()}
+                        onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex items-center justify-between mb-4">
                             <h2 className="text-lg font-semibold">Редагувати товар #{editing.id}</h2>

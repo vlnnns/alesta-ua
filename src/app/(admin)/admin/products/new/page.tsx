@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
@@ -73,8 +73,8 @@ function sameKey(
         (a.manufacturer ?? '').trim() === (b.manufacturer ?? '').trim()
     )
 }
-// utils/isAbort.ts
-export function isAbort(e: unknown): boolean {
+
+function isAbort(e: unknown): boolean {
     return e instanceof DOMException && e.name === 'AbortError'
 }
 
@@ -82,6 +82,7 @@ export function isAbort(e: unknown): boolean {
 
 export default function NewProductPage() {
     const router = useRouter()
+    const formRef = useRef<HTMLFormElement>(null)
 
     const [items, setItems] = useState<Product[]>([])
     const [metaApi, setMetaApi] = useState<MetaApi | null>(null)
@@ -94,11 +95,14 @@ export default function NewProductPage() {
     const [file, setFile] = useState<File | null>(null)
     const [lastUploadedPath, setLastUploadedPath] = useState<string | null>(null)
 
-    // модалка про дублікат
+    // модалки
     const [dupOpen, setDupOpen] = useState(false)
     const [dupExistingId, setDupExistingId] = useState<number | null>(null)
     const [pendingPayload, setPendingPayload] =
         useState<Omit<CreatePayload, 'image'> | null>(null)
+
+    // ✅ успішне створення
+    const [success, setSuccess] = useState<{ id: number } | null>(null)
 
     /* ---- load items + meta ---- */
     useEffect(() => {
@@ -114,17 +118,13 @@ export default function NewProductPage() {
                 const data = (await res.json()) as { items: Product[] }
                 setItems(data.items ?? [])
             } catch (e) {
-                if (!isAbort(e)) {
-                    // тут можно залогировать или показать мягкое уведомление
-                    console.warn('Failed to load meta', e)
-                }
+                if (!isAbort(e)) console.warn('Failed to load items/meta', e)
             } finally {
                 setMetaLoading(false)
             }
         })()
         return () => ac.abort()
     }, [])
-
 
     /* ---- build datalists (API + fallback из items) ---- */
     const meta = useMemo(() => {
@@ -147,37 +147,20 @@ export default function NewProductPage() {
                 thicknesses: metaApi.thicknesses.map(String),
             }
             : null
-        const pick = (a?: string[], b?: string[]) =>
-            uniq([...(a ?? []), ...(b ?? [])])
+        const pick = (a?: string[], b?: string[]) => uniq([...(a ?? []), ...(b ?? [])])
 
         return {
-            types: pick(fromApi?.types, fromItems.types).sort((a, b) =>
-                a.localeCompare(b, 'uk'),
-            ),
-            formats: pick(fromApi?.formats, fromItems.formats).sort((a, b) =>
-                a.localeCompare(b, 'uk'),
-            ),
-            grades: pick(fromApi?.grades, fromItems.grades).sort((a, b) =>
-                a.localeCompare(b, 'uk'),
-            ),
-            manufacturers: pick(fromApi?.manufacturers, fromItems.manufacturers).sort(
-                (a, b) => a.localeCompare(b, 'uk'),
-            ),
-            waterproofings: pick(fromApi?.waters, fromItems.waters).sort((a, b) =>
-                a.localeCompare(b, 'uk'),
-            ),
-            thicknesses: pick(fromApi?.thicknesses, fromItems.thicknesses).sort(
-                (a, b) => Number(a) - Number(b),
-            ),
+            types: pick(fromApi?.types, fromItems.types).sort((a, b) => a.localeCompare(b, 'uk')),
+            formats: pick(fromApi?.formats, fromItems.formats).sort((a, b) => a.localeCompare(b, 'uk')),
+            grades: pick(fromApi?.grades, fromItems.grades).sort((a, b) => a.localeCompare(b, 'uk')),
+            manufacturers: pick(fromApi?.manufacturers, fromItems.manufacturers).sort((a, b) => a.localeCompare(b, 'uk')),
+            waterproofings: pick(fromApi?.waters, fromItems.waters).sort((a, b) => a.localeCompare(b, 'uk')),
+            thicknesses: pick(fromApi?.thicknesses, fromItems.thicknesses).sort((a, b) => Number(a) - Number(b)),
         }
     }, [items, metaApi])
 
     /* ---- network helpers ---- */
-    async function uploadImage(file: File): Promise<{
-        ok: boolean
-        path?: string
-        error?: string
-    }> {
+    async function uploadImage(file: File): Promise<{ ok: boolean; path?: string; error?: string }> {
         const fd = new FormData()
         fd.append('image', file)
         const res = await fetch('/api/upload', { method: 'POST', body: fd })
@@ -195,10 +178,7 @@ export default function NewProductPage() {
         return { ok: true, path: p }
     }
 
-    async function createProduct(
-        payload: CreatePayload,
-        opts?: { force?: boolean },
-    ) {
+    async function createProduct(payload: CreatePayload, opts?: { force?: boolean }) {
         const res = await fetch('/api/admin/products', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -270,7 +250,7 @@ export default function NewProductPage() {
             const payload: CreatePayload = { ...core, image: up.path }
             const res = await createProduct(payload) // без force
 
-            // если бэк нашёл дубль — открываем модалку
+            // якщо бек віддав DUPLICATE
             if (!res.ok && res.error === 'DUPLICATE') {
                 setDupExistingId(res.existingId ?? null)
                 setPendingPayload(core)
@@ -284,7 +264,9 @@ export default function NewProductPage() {
                 setError(res.error || 'Помилка збереження')
                 return
             }
-            router.push('/admin/products')
+
+            // ✅ показати модалку успіху замість моментального редіректу
+            setSuccess({ id: res.id })
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Помилка збереження')
             setLoading(false)
@@ -326,11 +308,24 @@ export default function NewProductPage() {
                 return
             }
             setDupOpen(false)
-            router.push('/admin/products')
+            // ✅ модалка успіху
+            setSuccess({ id: res.id })
         } catch (e) {
             setError(e instanceof Error ? e.message : 'Помилка збереження')
             setLoading(false)
         }
+    }
+
+    /* ---- helper: очистить форму для "Створити ще" ---- */
+    function resetFormForAnother() {
+        formRef.current?.reset()
+        setFile(null)
+        setPreview(null)
+        setLastUploadedPath(null)
+        setPendingPayload(null)
+        setDupExistingId(null)
+        setError(null)
+        setSuccess(null)
     }
 
     /* ---------- render ---------- */
@@ -339,112 +334,40 @@ export default function NewProductPage() {
             <div className="mx-auto max-w-3xl">
                 <div className="flex items-center justify-between mb-6">
                     <h1 className="text-2xl font-semibold">Додати товар</h1>
-                    <Link
-                        href="/admin/products"
-                        className="text-neutral-400 hover:text-neutral-600 text-xl"
-                        aria-label="Закрити"
-                    >
+                    <Link href="/admin/products" className="text-neutral-400 hover:text-neutral-600 text-xl" aria-label="Закрити">
                         ✖
                     </Link>
                 </div>
 
                 <form
+                    ref={formRef}
                     onSubmit={onSubmit}
                     encType="multipart/form-data"
                     className="rounded-2xl border border-neutral-200 bg-white p-5 space-y-4"
                 >
                     <div className="grid gap-4 sm:grid-cols-2">
-                        <label className={label}>
-                            Тип *
-                            <input name="type" className={input} list="types" required />
-                        </label>
+                        <label className={label}>Тип *<input name="type" className={input} list="types" required /></label>
 
-                        {/* text+datalist чтобы работало в Safari */}
+                        {/* text+datalist щоб працювало і в Safari */}
                         <label className={label}>
                             Товщина (мм) *
-                            <input
-                                name="thickness"
-                                type="text"
-                                inputMode="decimal"
-                                className={input}
-                                list="thicknesses"
-                                required
-                            />
+                            <input name="thickness" type="text" inputMode="decimal" className={input} list="thicknesses" required />
                         </label>
 
-                        <label className={label}>
-                            Формат *
-                            <input name="format" className={input} list="formats" required />
-                        </label>
-
-                        <label className={label}>
-                            Сорт *
-                            <input name="grade" className={input} list="grades" />
-                        </label>
-
-                        <label className={label}>
-                            Виробник *
-                            <input
-                                name="manufacturer"
-                                className={input}
-                                list="manufacturers"
-                                required
-                            />
-                        </label>
-
-                        <label className={label}>
-                            Вологостійкість *
-                            <input
-                                name="waterproofing"
-                                className={input}
-                                list="waterproofings"
-                                required
-                            />
-                        </label>
-
-                        <label className={label}>
-                            Ціна (₴) *
-                            <input
-                                name="price"
-                                type="text"
-                                inputMode="decimal"
-                                className={input}
-                                required
-                            />
-                        </label>
+                        <label className={label}>Формат *<input name="format" className={input} list="formats" required /></label>
+                        <label className={label}>Сорт *<input name="grade" className={input} list="grades" /></label>
+                        <label className={label}>Виробник *<input name="manufacturer" className={input} list="manufacturers" required /></label>
+                        <label className={label}>Вологостійкість *<input name="waterproofing" className={input} list="waterproofings" required /></label>
+                        <label className={label}>Ціна (₴) *<input name="price" type="text" inputMode="decimal" className={input} required /></label>
                     </div>
 
                     {/* datalists */}
-                    <datalist id="types">
-                        {meta.types.map(v => (
-                            <option key={v} value={v} />
-                        ))}
-                    </datalist>
-                    <datalist id="thicknesses">
-                        {meta.thicknesses.map(v => (
-                            <option key={v} value={v} />
-                        ))}
-                    </datalist>
-                    <datalist id="formats">
-                        {meta.formats.map(v => (
-                            <option key={v} value={v} />
-                        ))}
-                    </datalist>
-                    <datalist id="grades">
-                        {meta.grades.map(v => (
-                            <option key={v} value={v} />
-                        ))}
-                    </datalist>
-                    <datalist id="manufacturers">
-                        {meta.manufacturers.map(v => (
-                            <option key={v} value={v} />
-                        ))}
-                    </datalist>
-                    <datalist id="waterproofings">
-                        {meta.waterproofings.map(v => (
-                            <option key={v} value={v} />
-                        ))}
-                    </datalist>
+                    <datalist id="types">{meta.types.map(v => <option key={v} value={v} />)}</datalist>
+                    <datalist id="thicknesses">{meta.thicknesses.map(v => <option key={v} value={v} />)}</datalist>
+                    <datalist id="formats">{meta.formats.map(v => <option key={v} value={v} />)}</datalist>
+                    <datalist id="grades">{meta.grades.map(v => <option key={v} value={v} />)}</datalist>
+                    <datalist id="manufacturers">{meta.manufacturers.map(v => <option key={v} value={v} />)}</datalist>
+                    <datalist id="waterproofings">{meta.waterproofings.map(v => <option key={v} value={v} />)}</datalist>
 
                     {/* файл */}
                     <div>
@@ -460,17 +383,13 @@ export default function NewProductPage() {
                                     const f = e.currentTarget.files?.[0] || null
                                     setFile(f)
                                     setPreview(f ? URL.createObjectURL(f) : null)
-                                    setLastUploadedPath(null) // новый файл → сбросить прежний путь
+                                    setLastUploadedPath(null)
                                 }}
                             />
                             {preview && (
                                 <div className="mt-2">
                                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                                    <img
-                                        src={preview}
-                                        alt="preview"
-                                        className="h-28 w-28 rounded-lg border border-neutral-200 object-cover"
-                                    />
+                                    <img src={preview} alt="preview" className="h-28 w-28 rounded-lg border border-neutral-200 object-cover" />
                                 </div>
                             )}
                         </label>
@@ -482,40 +401,26 @@ export default function NewProductPage() {
                     </label>
 
                     {error && (
-                        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                            {error}
-                        </div>
+                        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
                     )}
 
                     <div className="flex items-center gap-3">
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="rounded-xl bg-[#D08B4C] px-5 py-3 text-white hover:bg-[#c57b37] disabled:opacity-60"
-                        >
+                        <button type="submit" disabled={loading} className="rounded-xl bg-[#D08B4C] px-5 py-3 text-white hover:bg-[#c57b37] disabled:opacity-60">
                             {loading ? 'Зберігаємо…' : 'Створити товар'}
                         </button>
 
-                        <Link
-                            href="/admin/products"
-                            className="rounded-xl border border-neutral-300 px-5 py-3 text-neutral-700 hover:bg-neutral-100"
-                        >
+                        <Link href="/admin/products" className="rounded-xl border border-neutral-300 px-5 py-3 text-neutral-700 hover:bg-neutral-100">
                             Скасувати
                         </Link>
                     </div>
 
-                    {metaLoading && (
-                        <div className="text-xs text-neutral-500">Завантажуємо підказки…</div>
-                    )}
+                    {metaLoading && <div className="text-xs text-neutral-500">Завантажуємо підказки…</div>}
                 </form>
             </div>
 
             {/* ----- Модалка дубликата ----- */}
             {dupOpen && (
-                <div
-                    className="fixed inset-0 z-50"
-                    onMouseDown={() => setDupOpen(false)}
-                >
+                <div className="fixed inset-0 z-50" onMouseDown={() => setDupOpen(false)}>
                     <div className="absolute inset-0 bg-black/40" />
                     <div
                         className="absolute left-1/2 top-1/2 w-[520px] max-w-[95vw] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white shadow-2xl"
@@ -523,31 +428,19 @@ export default function NewProductPage() {
                     >
                         <div className="p-5 border-b border-neutral-200 flex items-center justify-between">
                             <h3 className="text-lg font-semibold">Схожий товар уже існує</h3>
-                            <button
-                                onClick={() => setDupOpen(false)}
-                                className="p-2 hover:bg-black/5 rounded-lg"
-                                aria-label="Закрити"
-                            >
-                                ✕
-                            </button>
+                            <button onClick={() => setDupOpen(false)} className="p-2 hover:bg-black/5 rounded-lg" aria-label="Закрити">✕</button>
                         </div>
 
                         <div className="p-5 space-y-3 text-sm">
                             <p>
                                 Знайдено існуючий товар з такими ж характеристиками
-                                {dupExistingId ? (
-                                    <>: <span className="font-mono text-neutral-700">#{dupExistingId}</span></>
-                                ) : null}
-                                .
+                                {dupExistingId ? <>: <span className="font-mono text-neutral-700">#{dupExistingId}</span></> : null}.
                             </p>
                             <p>Що зробити?</p>
                         </div>
 
                         <div className="p-4 border-t border-neutral-200 flex flex-wrap gap-2 justify-end">
-                            <button
-                                onClick={() => setDupOpen(false)}
-                                className="rounded-xl border border-neutral-200 px-4 py-2 hover:bg-neutral-50"
-                            >
+                            <button onClick={() => setDupOpen(false)} className="rounded-xl border border-neutral-200 px-4 py-2 hover:bg-neutral-50">
                                 Закрити
                             </button>
 
@@ -561,11 +454,54 @@ export default function NewProductPage() {
                                 </Link>
                             )}
 
+                            <button onClick={createAnyway} className="rounded-xl bg-[#D08B4C] px-4 py-2 text-white hover:bg-[#c57b37]">
+                                Створити все одно
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ✅ ----- Модалка успішного створення ----- */}
+            {success && (
+                <div className="fixed inset-0 z-50" onMouseDown={() => setSuccess(null)}>
+                    <div className="absolute inset-0 bg-black/40" />
+                    <div
+                        className="absolute left-1/2 top-1/2 w-[520px] max-w-[95vw] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white shadow-2xl"
+                        onMouseDown={e => e.stopPropagation()}
+                    >
+                        <div className="p-5 border-b border-neutral-200 flex items-center justify-between">
+                            <h3 className="text-lg font-semibold">Товар створено</h3>
+                            <button onClick={() => setSuccess(null)} className="p-2 hover:bg-black/5 rounded-lg" aria-label="Закрити">✕</button>
+                        </div>
+
+                        <div className="p-5 space-y-3 text-sm">
+                            <p>
+                                Новий продукт успішно створено:&nbsp;
+                                <span className="font-mono text-neutral-700">#{success.id}</span>
+                            </p>
+                        </div>
+
+                        <div className="p-4 border-t border-neutral-200 flex flex-wrap gap-2 justify-end">
+                            <Link
+                                href="/admin/products"
+                                className="rounded-xl border border-neutral-200 px-4 py-2 hover:bg-neutral-50"
+                            >
+                                До списку
+                            </Link>
+
+                            <Link
+                                href={`/admin/products?edit=${success.id}`}
+                                className="rounded-xl border border-neutral-200 px-4 py-2 hover:bg-neutral-50"
+                            >
+                                Редагувати щойно створений
+                            </Link>
+
                             <button
-                                onClick={createAnyway}
+                                onClick={resetFormForAnother}
                                 className="rounded-xl bg-[#D08B4C] px-4 py-2 text-white hover:bg-[#c57b37]"
                             >
-                                Створити все одно
+                                Створити ще
                             </button>
                         </div>
                     </div>
