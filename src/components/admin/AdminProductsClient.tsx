@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect, useMemo, useState, type ReactElement } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import Breadcrumbs from '@/components/common/Breadcrumbs'
-import { useSearchParams } from 'next/navigation'
+import { useEffect, useMemo, useState, type ReactElement, Suspense } from 'react'
+import { useSearchParams, usePathname, useRouter } from 'next/navigation'
+
 
 /* ---------- Types ---------- */
 type Product = {
@@ -44,6 +45,26 @@ type Option = { v: string; t: string }
 const isOption = (o: unknown): o is Option =>
     typeof o === 'object' && o !== null && 'v' in o && 't' in o
 
+/* ---------- Suspense helper for ?edit=ID ---------- */
+function EditOpener({
+                        items,
+                        onOpen,
+                    }: {
+    items: Product[]
+    onOpen: (p: Product) => void
+}) {
+    const search = useSearchParams()
+    useEffect(() => {
+        const qId = search.get('edit')
+        if (!qId) return
+        const pid = Number(qId)
+        if (!Number.isFinite(pid) || !items.length) return
+        const p = items.find(x => x.id === pid)
+        if (p) onOpen(p)
+    }, [search, items, onOpen])
+    return null
+}
+
 /* ---------- Component ---------- */
 export default function AdminProductsClient(): ReactElement {
     const [items, setItems] = useState<Product[]>([])
@@ -73,15 +94,21 @@ export default function AdminProductsClient(): ReactElement {
     const [deletingType, setDeletingType] = useState<string | null>(null)
 
     const search = useSearchParams()
+    const pathname = usePathname()
+    const router = useRouter()
 
+    const closeEdit = () => {
+        setEditing(null)
+        const params = new URLSearchParams(search.toString())
+        params.delete('edit')
+        router.replace(`${pathname}${params.size ? `?${params}` : ''}`, { scroll: false })
+    }
     useEffect(() => {
-        const qId = search.get('edit')
-        if (!qId) return
-        const pid = Number(qId)
-        if (!Number.isFinite(pid) || !items.length) return
-        const p = items.find(x => x.id === pid)
-        if (p) setEditing(p)
-    }, [search, items])
+        if (!editing) return
+        const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') closeEdit() }
+        window.addEventListener('keydown', onKey)
+        return () => window.removeEventListener('keydown', onKey)
+    }, [editing, closeEdit])
 
     /* ---- Load meta ---- */
     useEffect(() => {
@@ -318,6 +345,11 @@ export default function AdminProductsClient(): ReactElement {
     /* ---------- Render ---------- */
     return (
         <main className="px-4 sm:px-6 py-10 bg-neutral-50 text-neutral-900">
+            {/* Suspense + EditOpener для ?edit=ID */}
+            <Suspense fallback={null}>
+                <EditOpener items={items} onOpen={(p) => setEditing(p)} />
+            </Suspense>
+
             <div className="max-w-6xl mx-auto">
                 <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Адмінка', href: '/admin' }, { label: 'Товари' }]} />
 
@@ -534,14 +566,18 @@ export default function AdminProductsClient(): ReactElement {
 
             {/* Edit modal */}
             {editing && (
-                <div className="fixed inset-0 z-50">
-                    <div className="absolute inset-0 bg-black/40" onClick={() => setEditing(null)} />
-                    <div className="absolute right-0 top-0 h-full w-[560px] max-w-[100vw] bg-white shadow-2xl p-6 overflow-y-auto">
+                <div className="fixed inset-0 z-50" onMouseDown={closeEdit}>
+                    {/* Подложка ловит клик мыши и закрывает */}
+                    <div className="absolute inset-0 bg-black/40" />
+
+                    {/* Панель модалки: стопаем событие, чтобы клик внутри НЕ закрывал */}
+                    <div
+                        className="absolute right-0 top-0 h-full w-[560px] max-w-[100vw] bg-white shadow-2xl p-6 overflow-y-auto"
+                        onMouseDown={(e) => e.stopPropagation()}
+                    >
                         <div className="flex items-center justify-between mb-4">
                             <h2 className="text-lg font-semibold">Редагувати товар #{editing.id}</h2>
-                            <button onClick={() => setEditing(null)} className="p-2 hover:bg-black/5 rounded-lg" aria-label="Закрити">
-                                ✕
-                            </button>
+                            <button onClick={closeEdit} className="p-2 hover:bg-black/5 rounded-lg" aria-label="Закрити">✕</button>
                         </div>
 
                         <form onSubmit={submitEdit} className="grid grid-cols-2 gap-4">
@@ -576,7 +612,7 @@ export default function AdminProductsClient(): ReactElement {
                                 </button>
                                 <button
                                     type="button"
-                                    onClick={() => setEditing(null)}
+                                    onClick={closeEdit}
                                     className="rounded-xl px-5 py-2.5 border border-neutral-200 hover:bg-neutral-50"
                                 >
                                     Скасувати

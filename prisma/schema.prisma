@@ -21,8 +21,6 @@ model PlywoodProduct {
   inStock       Boolean  @default(true)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-
-  @@unique([type, thickness, format, grade, manufacturer])
 }
 
 enum DeliveryMethod {

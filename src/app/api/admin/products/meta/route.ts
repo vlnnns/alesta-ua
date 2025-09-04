@@ -8,6 +8,7 @@ const isDefined = <T,>(v: T | null | undefined): v is T => v !== null && v !== u
 const isNonEmpty = (s: unknown): s is string => typeof s === 'string' && s.trim().length > 0
 const uniq = <T,>(arr: (T | null | undefined)[]) => Array.from(new Set(arr.filter(isDefined)))
 
+
 export async function GET() {
     try {
         const rows = await prisma.plywoodProduct.findMany({
