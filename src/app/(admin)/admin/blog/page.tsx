@@ -54,9 +54,9 @@ export default async function AdminBlogListPage() {
                                         {/* Форма удаления — обычный POST на роут */}
                                         <form action="/admin/blog/delete" method="POST">
                                             <input type="hidden" name="id" value={p.id} />
-                                            {/* Кнопка-подтверждение — клиентский компонент */}
                                             <ConfirmDeleteButton />
                                         </form>
+
                                     </div>
                                 </td>
                             </tr>
