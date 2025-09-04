@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, type ReactElement } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import Breadcrumbs from '@/components/common/Breadcrumbs'
+import { useSearchParams } from 'next/navigation'
 
 /* ---------- Types ---------- */
 type Product = {
@@ -70,6 +71,17 @@ export default function AdminProductsClient(): ReactElement {
 
     // "Delete type" button state
     const [deletingType, setDeletingType] = useState<string | null>(null)
+
+    const search = useSearchParams()
+
+    useEffect(() => {
+        const qId = search.get('edit')
+        if (!qId) return
+        const pid = Number(qId)
+        if (!Number.isFinite(pid) || !items.length) return
+        const p = items.find(x => x.id === pid)
+        if (p) setEditing(p)
+    }, [search, items])
 
     /* ---- Load meta ---- */
     useEffect(() => {

@@ -1,9 +1,8 @@
-// app/admin/products/new/page.tsx
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createProduct } from './actions'
+import { createProduct, type CreateResult } from './actions'
 
 type Product = {
     id: number; type: string; thickness: number; format: string; grade: string;
@@ -17,6 +16,10 @@ export default function NewProductPage() {
     const [preview, setPreview] = useState<string | null>(null)
     const [file, setFile] = useState<File | null>(null)
 
+    // для діалогу “вже існує”
+    const [dup, setDup] = useState<{ id: number | null } | null>(null)
+
+    // підказки
     const [items, setItems] = useState<Product[]>([])
     const [metaLoading, setMetaLoading] = useState(true)
 
@@ -29,7 +32,11 @@ export default function NewProductPage() {
                 if (!res.ok) throw new Error(`HTTP ${res.status}`)
                 const data = (await res.json()) as { items: Product[] }
                 setItems(data.items ?? [])
-            } catch {} finally { setMetaLoading(false) }
+            } catch {
+                /* noop — форма працює і без підказок */
+            } finally {
+                setMetaLoading(false)
+            }
         })()
         return () => ac.abort()
     }, [])
@@ -54,8 +61,7 @@ export default function NewProductPage() {
         fd.append('image', file)
         const res = await fetch('/api/upload', { method: 'POST', body: fd })
         if (!res.ok) {
-            let msg = `Upload HTTP ${res.status}`
-            try { const j = await res.json(); if (j?.error) msg = j.error } catch {}
+            let msg = `Upload HTTP ${res.status}`; try { const j = await res.json(); if (j?.error) msg = j.error } catch {}
             return { ok: false, error: msg }
         }
         const data = (await res.json()) as { url?: string; path?: string }
@@ -70,17 +76,16 @@ export default function NewProductPage() {
         try {
             if (!file) { setError('Додайте файл зображення'); setLoading(false); return }
 
-            // 1) аплоад в /uploads через /api/upload
+            // 1) аплоад у /uploads
             const up = await uploadImage(file)
             if (!up.ok || !up.url) { setError(up.error || 'Не вдалося завантажити зображення'); setLoading(false); return }
 
-            // 2) збираємо дані форми
+            // 2) збір даних форми
             const f = new FormData(formEl)
             f.delete('imageFile')
+
             const thickness = Number(f.get('thickness'))
             const price = Number(f.get('price'))
-
-            // Пишемо в БД ВІДНОСНИЙ шлях, що віддає твій [...slug] роут
             const imagePath = up.path ?? new window.URL(up.url!, window.location.href).pathname
 
             const payload = {
@@ -92,12 +97,21 @@ export default function NewProductPage() {
                 waterproofing: String(f.get('waterproofing') || '').trim(),
                 price: Number.isFinite(price) ? price : 0,
                 inStock: f.get('inStock') === 'on',
-                image: imagePath,
+                image: imagePath, // ⬅️ у БД кладемо відносний шлях /uploads/...
             }
 
-            const res = await createProduct(payload)
+            const res: CreateResult = await createProduct(payload)
             setLoading(false)
-            if (!res.ok) { setError(res.error ?? 'Помилка збереження'); return }
+
+            if (!res.ok) {
+                if (res.code === 'ALREADY_EXISTS') {
+                    setDup({ id: res.existingId ?? null })
+                    return
+                }
+                setError(res.error ?? 'Помилка збереження')
+                return
+            }
+
             router.push('/admin/products')
         } catch (err: unknown) {
             setError(err instanceof Error ? err.message : 'Помилка збереження')
@@ -167,6 +181,45 @@ export default function NewProductPage() {
                     {metaLoading && <div className="text-xs text-neutral-500">Завантажуємо підказки…</div>}
                 </form>
             </div>
+
+            {/* ДІАЛОГ про дублікат */}
+            {dup && (
+                <div className="fixed inset-0 z-50">
+                    <div className="absolute inset-0 bg-black/40" onClick={() => setDup(null)} />
+                    <div className="absolute left-1/2 top-1/2 w-[520px] max-w-[95vw] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-neutral-200 bg-white p-5 shadow-2xl">
+                        <div className="flex items-start justify-between gap-4">
+                            <div>
+                                <h3 className="text-lg font-semibold text-neutral-900">Такий продукт вже існує</h3>
+                                <p className="mt-1 text-sm text-neutral-600">
+                                    Запис з такими полями вже є в базі. Ви можете відредагувати існуючий товар.
+                                </p>
+                                {dup.id && <p className="mt-1 text-xs text-neutral-500">ID: {dup.id}</p>}
+                            </div>
+                            <button onClick={() => setDup(null)} className="p-2 rounded-lg hover:bg-neutral-100 text-neutral-500" aria-label="Закрити">✕</button>
+                        </div>
+
+                        <div className="mt-4 flex items-center justify-end gap-2">
+                            <button
+                                type="button"
+                                onClick={() => setDup(null)}
+                                className="rounded-xl border border-neutral-200 px-4 py-2 text-sm hover:bg-neutral-50"
+                            >
+                                Закрити
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    if (dup.id) window.location.href = `/admin/products?edit=${dup.id}`
+                                    else window.location.href = '/admin/products'
+                                }}
+                                className="rounded-xl bg-[#D08B4C] px-4 py-2 text-sm text-white hover:bg-[#c57b37]"
+                            >
+                                Редагувати продукт
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </main>
     )
 }

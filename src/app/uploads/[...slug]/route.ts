@@ -1,4 +1,3 @@
-// app/uploads/[...slug]/route.ts
 import { NextResponse } from 'next/server'
 import { promises as fs } from 'fs'
 import path from 'path'
@@ -18,16 +17,12 @@ function contentType(ext: string) {
     }
 }
 
-export async function GET(
-    _req: Request,
-    ctx: { params: Promise<{ slug: string[] }> }
-) {
+export async function GET(_req: Request, ctx: { params: Promise<{ slug: string[] }> }) {
     try {
         const { slug } = await ctx.params
         const root = path.resolve(path.join(process.cwd(), 'uploads'))
         const resolved = path.resolve(path.join(root, ...slug))
 
-        // захист від виходу за межі каталогу
         if (!resolved.startsWith(root + path.sep)) {
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
         }
