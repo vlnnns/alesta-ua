@@ -1,8 +1,9 @@
+// app/admin/products/new/page.tsx
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createProduct } from './actions' // server action в другом файле
+import { createProduct } from './actions'
 
 type Product = {
     id: number; type: string; thickness: number; format: string; grade: string;
@@ -28,7 +29,7 @@ export default function NewProductPage() {
                 if (!res.ok) throw new Error(`HTTP ${res.status}`)
                 const data = (await res.json()) as { items: Product[] }
                 setItems(data.items ?? [])
-            } catch {/* noop */} finally { setMetaLoading(false) }
+            } catch {} finally { setMetaLoading(false) }
         })()
         return () => ac.abort()
     }, [])
@@ -48,61 +49,39 @@ export default function NewProductPage() {
     const label = 'block text-sm text-neutral-600 mb-1'
     const input = 'w-full rounded-xl border border-neutral-200 bg-white px-3 py-2 outline-none focus:ring-2 focus:ring-[#D08B4C]/30 focus:border-[#D08B4C]'
 
-// 1) uploadImage: возвращаем и абсолютный url, и относительный path
-    async function uploadImage(file: File): Promise<{
-        ok: boolean;
-        url?: string;   // абсолютный (для превью)
-        path?: string;  // относительный "/uploads/..." (в БД)
-        error?: string;
-    }> {
+    async function uploadImage(file: File): Promise<{ ok: boolean; url?: string; path?: string; error?: string }> {
         const fd = new FormData()
         fd.append('image', file)
-
         const res = await fetch('/api/upload', { method: 'POST', body: fd })
         if (!res.ok) {
             let msg = `Upload HTTP ${res.status}`
             try { const j = await res.json(); if (j?.error) msg = j.error } catch {}
             return { ok: false, error: msg }
         }
-
         const data = (await res.json()) as { url?: string; path?: string }
         return { ok: true, url: data.url, path: data.path }
     }
 
-// 2) onSubmit: без "..." внутри if
     async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
-        setError(null)
-        setLoading(true)
-
-        // сохраняем ссылку на форму ДО любых await
+        setError(null); setLoading(true)
         const formEl = e.currentTarget
 
         try {
-            if (!file) {
-                setError('Додайте файл зображення')
-                setLoading(false)
-                return
-            }
+            if (!file) { setError('Додайте файл зображення'); setLoading(false); return }
 
-            // сначала заливаем картинку
+            // 1) аплоад в /uploads через /api/upload
             const up = await uploadImage(file)
-            if (!up.ok || !up.url) {
-                setError(up.error || 'Не вдалося завантажити зображення')
-                setLoading(false)
-                return
-            }
+            if (!up.ok || !up.url) { setError(up.error || 'Не вдалося завантажити зображення'); setLoading(false); return }
 
-            // собираем данные формы
+            // 2) збираємо дані форми
             const f = new FormData(formEl)
             f.delete('imageFile')
-
             const thickness = Number(f.get('thickness'))
             const price = Number(f.get('price'))
 
-            // относительный путь для БД
-            const imagePath =
-                up.path ?? new window.URL(up.url!, window.location.href).pathname
+            // Пишемо в БД ВІДНОСНИЙ шлях, що віддає твій [...slug] роут
+            const imagePath = up.path ?? new window.URL(up.url!, window.location.href).pathname
 
             const payload = {
                 type: String(f.get('type') || '').trim(),
@@ -116,19 +95,15 @@ export default function NewProductPage() {
                 image: imagePath,
             }
 
-            const res = await createProduct(payload) // plain object
+            const res = await createProduct(payload)
             setLoading(false)
-            if (!res.ok) {
-                setError(res.error ?? 'Помилка збереження')
-                return
-            }
+            if (!res.ok) { setError(res.error ?? 'Помилка збереження'); return }
             router.push('/admin/products')
         } catch (err: unknown) {
             setError(err instanceof Error ? err.message : 'Помилка збереження')
             setLoading(false)
         }
     }
-
 
     return (
         <main className="px-4 sm:px-6 py-10 bg-neutral-50 text-neutral-900">
@@ -149,6 +124,7 @@ export default function NewProductPage() {
                         <label className={label}>Ціна (₴) *<input name="price" type="number" min="0" className={input} required /></label>
                     </div>
 
+                    {/* datalists */}
                     <datalist id="types">{meta.types.map(v => <option key={v} value={v} />)}</datalist>
                     <datalist id="thicknesses">{meta.thicknesses.map(v => <option key={v} value={v} />)}</datalist>
                     <datalist id="formats">{meta.formats.map(v => <option key={v} value={v} />)}</datalist>
@@ -156,6 +132,7 @@ export default function NewProductPage() {
                     <datalist id="manufacturers">{meta.manufacturers.map(v => <option key={v} value={v} />)}</datalist>
                     <datalist id="waterproofings">{meta.waterproofings.map(v => <option key={v} value={v} />)}</datalist>
 
+                    {/* файл */}
                     <div>
                         <label className={label}>
                             Зображення (файл з ПК) *
@@ -166,7 +143,10 @@ export default function NewProductPage() {
                                     setFile(f); setPreview(f ? URL.createObjectURL(f) : null)
                                 }}
                             />
-                            {preview && (<div className="mt-2"><img src={preview} alt="preview" className="h-28 w-28 rounded-lg border border-neutral-200 object-cover" /></div>)}
+                            {preview && (<div className="mt-2">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img src={preview} alt="preview" className="h-28 w-28 rounded-lg border border-neutral-200 object-cover" />
+                            </div>)}
                         </label>
                     </div>
 
@@ -174,9 +154,6 @@ export default function NewProductPage() {
                         <input name="inStock" type="checkbox" defaultChecked className="h-4 w-4" />
                         <span className="text-sm text-neutral-700">В наявності</span>
                     </label>
-
-                    {/* скрытое поле на всякий случай — не обязательно теперь */}
-                    <input type="hidden" name="image" />
 
                     {error && <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
 

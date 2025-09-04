@@ -1,10 +1,10 @@
-// app/api/admin/products/[id]/route.ts
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { Prisma } from '@prisma/client'
 
 export const runtime = 'nodejs'
 
+// ---------- PATCH ----------
 type PatchBody = Partial<{
     type: string
     thickness: number
@@ -17,9 +17,10 @@ type PatchBody = Partial<{
     inStock: boolean
 }>
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }> }) {
     try {
-        const id = Number(params.id)
+        const { id: idStr } = await ctx.params          // ⬅️ await
+        const id = Number(idStr)
         if (!Number.isFinite(id)) return NextResponse.json({ error: 'BAD_ID' }, { status: 400 })
 
         let bodyJson: unknown
@@ -27,7 +28,6 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
         const body = bodyJson as PatchBody
 
         const data: Prisma.PlywoodProductUpdateInput = {}
-
         if (typeof body.type === 'string') data.type = body.type.trim()
         if (typeof body.thickness === 'number') data.thickness = body.thickness
         if (typeof body.format === 'string') data.format = body.format.trim()
@@ -46,18 +46,9 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
             where: { id },
             data,
             select: {
-                id: true,
-                type: true,
-                thickness: true,
-                format: true,
-                grade: true,
-                manufacturer: true,
-                waterproofing: true,
-                price: true,
-                image: true,
-                inStock: true,
-                createdAt: true,
-                updatedAt: true,
+                id: true, type: true, thickness: true, format: true, grade: true,
+                manufacturer: true, waterproofing: true, price: true, image: true,
+                inStock: true, createdAt: true, updatedAt: true,
             },
         })
 
@@ -67,10 +58,13 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     }
 }
 
-export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
+// ---------- DELETE ----------
+export async function DELETE(_req: Request, ctx: { params: Promise<{ id: string }> }) {
     try {
-        const id = Number(params.id)
+        const { id: idStr } = await ctx.params          // ⬅️ await
+        const id = Number(idStr)
         if (!Number.isFinite(id)) return NextResponse.json({ error: 'BAD_ID' }, { status: 400 })
+
         await prisma.plywoodProduct.delete({ where: { id } })
         return NextResponse.json({ ok: true })
     } catch {

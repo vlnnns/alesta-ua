@@ -1,3 +1,4 @@
+// app/admin/products/new/actions.ts
 'use server'
 
 import { prisma } from '@/lib/prisma'
@@ -15,10 +16,9 @@ const schema = z.object({
     waterproofing: z.string().min(1, 'Вкажіть клей/вологостійкість'),
     price: z.number().int().min(0, 'Ціна не може бути від’ємною'),
     inStock: z.boolean().optional().default(false),
-    // строгая проверка относительного пути вида /uploads/....
+    // зберігаємо /uploads/..., який віддасть твій [...slug] роут
     image: z.string().regex(/^\/uploads\/[A-Za-z0-9._-]+$/, 'Некоректний шлях зображення'),
 })
-
 
 export async function createProduct(data: unknown): Promise<CreateResult> {
     try {

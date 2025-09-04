@@ -20,29 +20,27 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'File too large' }, { status: 413 })
         }
 
-        const publicUploads = path.join(process.cwd(), 'public', 'uploads')
-        await fs.mkdir(publicUploads, { recursive: true })
+        // === зберігаємо НЕ в public, а в /uploads (на корені проекту) ===
+        const uploadsRoot = path.join(process.cwd(), 'uploads')
+        await fs.mkdir(uploadsRoot, { recursive: true })
 
         const ext =
-            file.type === 'image/jpeg' ? 'jpg'
-                : file.type === 'image/png' ? 'png'
-                    : file.type === 'image/webp' ? 'webp'
-                        : file.type === 'image/avif' ? 'avif'
-                            : 'bin'
+            file.type === 'image/jpeg' ? 'jpg' :
+                file.type === 'image/png'  ? 'png' :
+                    file.type === 'image/webp' ? 'webp' :
+                        file.type === 'image/avif' ? 'avif' : 'bin'
 
         const name = `${Date.now()}_${crypto.randomBytes(6).toString('hex')}.${ext}`
-        const fp = path.join(publicUploads, name)
+        const fullPath = path.join(uploadsRoot, name)
 
         const ab = await file.arrayBuffer()
-        await fs.writeFile(fp, Buffer.from(ab), { mode: 0o644 })
+        await fs.writeFile(fullPath, Buffer.from(ab), { mode: 0o644 })
 
+        // шлях, який віддає catch-all роут: /uploads/[...slug]
         const relPath = `/uploads/${name}`
-
-        // получаем абсолютный URL из запроса
         const { origin } = new URL(req.url)
         const absUrl = new URL(relPath, origin).toString()
 
-        // возвращаем оба
         return NextResponse.json({ url: absUrl, path: relPath })
     } catch (e: unknown) {
         return NextResponse.json(
